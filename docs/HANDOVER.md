@@ -19,7 +19,7 @@
 - **수강생 교육 과정 일원화**: `기본_AI 이해` 4단계 커리큘럼으로 대문(`README.md`)과 일치시킴
 
 ### 신규 GitHub 리포지토리 클린 배포
-- **리포지토리 URL**: https://github.com/gkisanet/2026.09-kbs-vibe-coding (Public)
+- **리포지토리 URL**: https://github.com/gkisanet/2026.autoreport (Public)
 - **보안 검증 완료**: 과거 커밋 히스토리를 차단한 단일 Initial Commit만 존재하며, `config.js`는 완벽히 로컬에만 격리 보존됨
 
 ### 교육 대문 및 저장소 정체성 정립 (`README.md`)
