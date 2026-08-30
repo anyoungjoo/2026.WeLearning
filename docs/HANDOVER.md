@@ -52,7 +52,7 @@
 - **`참고3_AGENTS_템플릿.md`**: 복사해서 쓰는 `AGENTS.md` 표준 양식
 - **`3-0. CONTEXT_관리.md`**: 메인 교재 (기존 `3. CONTEXT_관리.md`에서 개명 — 폴더 정렬용)
 
-### API_TEST (`API_TEST/`)
+### 2.AI_APP (`2.AI_APP/`)
 - **`v1_basic/`**: ✅ 완성된 3-Tier 채팅앱. **수강생은 실행하고 관찰만 함**
   - DB는 **진짜 SQLite** (`node:sqlite` 내장 모듈, `npm install` 불필요)
   - 테이블: `users` / `reports` / `chat_rooms` / `chat_messages`

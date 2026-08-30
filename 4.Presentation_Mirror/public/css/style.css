@@ -1,0 +1,1323 @@
+/* ==========================================================================
+   🎓 Presentation Mirror - Global Design System & Styles
+   Modern, Sleek, Glassmorphism-inspired UI with Dark/Light Mode Support
+   ========================================================================== */
+
+:root {
+  /* 라이트 테마 변수 */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-sidebar: #f1f5f9;
+  --bg-hover: #e2e8f0;
+  --bg-active: #cbd5e1;
+  --border-color: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  
+  --accent-primary: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-light: #dbeafe;
+  --accent-danger: #ef4444;
+  --accent-warning: #f59e0b;
+  --accent-success: #10b981;
+
+  --toolbar-bg: rgba(255, 255, 255, 0.88);
+  --toolbar-border: rgba(226, 232, 240, 0.8);
+  --toolbar-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Fira Code", "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+
+  --sidebar-width: 320px;
+  --header-height: 56px;
+  --content-max-width: 960px;
+}
+
+[data-theme="dark"] {
+  /* 다크 테마 변수 */
+  --bg-primary: #090d16;
+  --bg-secondary: #0f172a;
+  --bg-sidebar: #0a0f1d;
+  --bg-hover: #1e293b;
+  --bg-active: #334155;
+  --border-color: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --accent-primary: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-light: rgba(59, 130, 246, 0.15);
+
+  --toolbar-bg: rgba(15, 23, 42, 0.88);
+  --toolbar-border: rgba(30, 41, 59, 0.8);
+  --toolbar-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+}
+
+/* Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-primary) 55%, transparent);
+  outline-offset: 2px;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* App Container Layout */
+#app-container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ----------------------------------------------------
+   1. Header Navigation Bar
+   ---------------------------------------------------- */
+#main-header {
+  height: var(--header-height);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 50;
+  flex-shrink: 0;
+  backdrop-filter: blur(8px);
+}
+
+.header-left, .header-center, .header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.brand-badge {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--accent-light);
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.btn-icon {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-icon:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+/* Role & Sync Badges */
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 16px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.status-pill.follow-on {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.status-pill.follow-off {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.status-pill.presenter {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+  animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0); }
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+  display: inline-block;
+}
+
+/* Sync Toggle Switch */
+.sync-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  transition: .3s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+input:checked + .slider {
+  background-color: var(--accent-success);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* ----------------------------------------------------
+   2. Main Layout (Sidebar + Viewer Area)
+   ---------------------------------------------------- */
+#main-body {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - var(--header-height));
+  position: relative;
+  overflow: hidden;
+}
+
+/* Left Sidebar (File Explorer) */
+#sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: margin-left 0.25s ease;
+  z-index: 30;
+}
+
+#sidebar.collapsed {
+  margin-left: calc(-1 * var(--sidebar-width));
+}
+
+.sidebar-header {
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.sidebar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  border-radius: 4px;
+}
+
+.sidebar-search {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-search input {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.sidebar-search input:focus {
+  border-color: var(--accent-primary);
+}
+
+.sidebar-tree {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 6px;
+}
+
+/* File Tree Item Styles */
+.tree-node {
+  margin-bottom: 2px;
+  user-select: none;
+}
+
+.tree-folder-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tree-folder-title:hover {
+  background: var(--bg-hover);
+  color: var(--accent-primary);
+}
+
+.tree-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.tree-node.collapsed > .tree-folder-title .tree-caret {
+  transform: rotate(-90deg);
+}
+
+.tree-folder-icon {
+  color: #f59e0b;
+  font-size: 0.95rem;
+}
+
+.tree-file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 26px; /* 들여쓰기 */
+  border-radius: 6px;
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tree-file-item i {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.tree-file-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.tree-file-item:hover i {
+  color: var(--accent-primary);
+}
+
+.tree-folder-children {
+  padding-left: 8px;
+  display: block;
+  transition: all 0.2s ease;
+}
+
+.tree-node.collapsed > .tree-folder-children {
+  display: none;
+}
+
+.tree-file-item.active {
+  background: var(--accent-light);
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.tree-file-item.active i {
+  color: var(--accent-primary);
+}
+
+/* ----------------------------------------------------
+   3. Document Viewer & Canvas Presentation Workspace
+   ---------------------------------------------------- */
+#viewer-container {
+  flex: 1;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-primary);
+  scroll-behavior: auto; /* 프로그래밍 스크롤 제어를 위해 기본은 auto */
+}
+
+body[data-source-mode="desktop"] #sidebar,
+body[data-source-mode="desktop"] #btn-toggle-sidebar,
+body[data-source-mode="desktop"] #zoom-controls {
+  display: none !important;
+}
+
+body[data-source-mode="desktop"] #viewer-container {
+  overflow: hidden;
+  background: #06080d;
+}
+
+/* Zoom Container Wrapper */
+#content-zoom-wrapper {
+  transform-origin: top center;
+  transition: transform 0.15s ease-out;
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 40px 24px 120px 24px;
+}
+
+/* Document Inner Canvas & Content Host */
+#document-canvas-host {
+  position: relative;
+  width: 100%;
+  max-width: var(--content-max-width);
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border-color);
+  padding: 48px 56px;
+  min-height: 800px;
+}
+
+/* Markdown Content Styling */
+#markdown-content {
+  position: relative;
+  z-index: 5;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--text-primary);
+  overflow-wrap: break-word;
+}
+
+/* 1. 구분선(HR): 오직 구분선 위치만 시원하고 넉넉한 상하 여백 제공 */
+#markdown-content hr {
+  margin: 54px 0 46px 0;
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--border-color) 15%, var(--border-color) 85%, transparent);
+  opacity: 0.85;
+}
+
+/* 2. 대제목 / 중제목 / 소제목 여백 (집중도를 위해 컴팩트하게 조정) */
+#markdown-content h1 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  margin-top: 32px;
+  margin-bottom: 14px;
+  line-height: 1.35;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+#markdown-content h1:first-child {
+  margin-top: 0;
+}
+
+#markdown-content h2 {
+  font-size: 1.45rem;
+  font-weight: 750;
+  margin-top: 28px;
+  margin-bottom: 12px;
+  line-height: 1.38;
+  color: var(--text-primary);
+  border-bottom: 1.5px solid var(--border-color);
+  padding-bottom: 6px;
+}
+
+#markdown-content h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 22px;
+  margin-bottom: 10px;
+  line-height: 1.4;
+  color: var(--accent-primary);
+}
+
+#markdown-content h4,
+#markdown-content h5,
+#markdown-content h6 {
+  font-size: 1.05rem;
+  font-weight: 650;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+/* 3. 본문 단락, 리스트, 인용구 여백 (컴팩트한 밀도 유지) */
+#markdown-content p {
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+#markdown-content ul,
+#markdown-content ol {
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+
+#markdown-content li {
+  margin-bottom: 4px;
+  line-height: 1.7;
+}
+
+#markdown-content blockquote {
+  margin: 18px 0;
+  padding: 12px 16px;
+  background: var(--bg-sidebar);
+  border-left: 4px solid var(--accent-primary);
+  border-radius: 0 6px 6px 0;
+  color: var(--text-secondary);
+}
+
+#markdown-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+#markdown-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+  margin: 18px 0;
+}
+
+#markdown-content pre {
+  border-radius: 8px;
+  margin: 16px 0;
+  border: 1px solid var(--border-color);
+}
+
+#markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0;
+}
+
+#markdown-content th, #markdown-content td {
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+}
+
+#markdown-content th {
+  background: var(--bg-sidebar);
+}
+
+/* CSS Text Annotation Styles (Highlighter & Underline) */
+.pm-text-highlight {
+  background-color: #fde047;
+  color: inherit;
+  padding: 1px 3px;
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: all 0.15s ease;
+}
+
+.pm-text-underline {
+  border-bottom: 2.5px solid #ef4444;
+  padding-bottom: 1px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: all 0.15s ease;
+}
+
+[data-theme="dark"] .pm-text-highlight {
+  color: #0f172a !important;
+  font-weight: 500;
+}
+
+/* 어노테이션 지우개 모드 인터랙션 */
+body.eraser-mode [data-ann-id] {
+  cursor: pointer !important;
+  filter: brightness(0.9);
+}
+
+body.eraser-mode [data-ann-id]:hover {
+  text-decoration: line-through red 2px;
+  opacity: 0.6;
+}
+
+/* Whiteboard Overlay Canvas */
+#whiteboard-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 15;
+  pointer-events: none; /* 기본 수강생 모드는 클릭 투과 */
+  border-radius: 12px;
+}
+
+#whiteboard-canvas.drawing-active {
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+/* Laser Pointer Layer */
+#laser-pointer-dot {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ff0055;
+  box-shadow: 0 0 12px 4px rgba(255, 0, 85, 0.8), 0 0 20px 8px rgba(255, 0, 85, 0.4);
+  pointer-events: none;
+  z-index: 25;
+  transform: translate(-50%, -50%);
+  display: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Presenter Live Tool Cursor Pointer (강사 실시간 도구 커서) */
+.presenter-live-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.04s linear, opacity 0.2s ease;
+  will-change: transform;
+}
+
+.presenter-live-cursor.hidden {
+  display: none !important;
+}
+
+.presenter-live-cursor .cursor-icon-wrapper {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.9);
+  transition: all 0.15s ease;
+}
+
+.presenter-live-cursor[data-tool="highlight"] .cursor-icon-wrapper {
+  background: #eab308;
+  color: #000;
+  box-shadow: 0 0 12px 3px rgba(234, 179, 8, 0.6), 0 0 0 2px #fff;
+}
+
+.presenter-live-cursor[data-tool="underline"] .cursor-icon-wrapper {
+  background: #ef4444;
+  color: #fff;
+  box-shadow: 0 0 12px 3px rgba(239, 68, 68, 0.6), 0 0 0 2px #fff;
+}
+
+.presenter-live-cursor[data-tool="draw"] .cursor-icon-wrapper {
+  background: #3b82f6;
+  color: #fff;
+  box-shadow: 0 0 12px 3px rgba(59, 130, 246, 0.6), 0 0 0 2px #fff;
+}
+
+.presenter-live-cursor[data-tool="eraser"] .cursor-icon-wrapper {
+  background: #64748b;
+  color: #fff;
+  box-shadow: 0 0 12px 3px rgba(100, 116, 139, 0.6), 0 0 0 2px #fff;
+}
+
+.presenter-live-cursor .cursor-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  color: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Desktop WebRTC Stage */
+.desktop-share-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #06080d;
+  color: #f8fafc;
+}
+
+.desktop-share-stage video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #06080d;
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.desktop-share-stage.is-live video {
+  opacity: 1;
+}
+
+.desktop-share-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px;
+  text-align: center;
+  background: #0a0f19;
+  transition: opacity 180ms ease-out;
+}
+
+.desktop-share-stage.is-live:not(.presenter-view) .desktop-share-state {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.desktop-share-state-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 48px;
+  margin-bottom: 8px;
+  color: #93c5fd;
+  font-size: 2.1rem;
+}
+
+.desktop-share-state.is-loading .desktop-share-state-icon {
+  animation: screen-connect-pulse 1.4s ease-in-out infinite;
+}
+
+.desktop-share-state.is-error .desktop-share-state-icon {
+  color: #fca5a5;
+}
+
+.desktop-share-state h2 {
+  max-width: 28ch;
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  line-height: 1.35;
+}
+
+.desktop-share-state p {
+  max-width: 52ch;
+  color: #a8b3c4;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.desktop-share-state .btn-secondary {
+  margin-top: 12px;
+  border-color: #334155;
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+.desktop-live-badge {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border: 1px solid rgba(252, 165, 165, 0.42);
+  border-radius: 999px;
+  background: rgba(127, 29, 29, 0.86);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes screen-connect-pulse {
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
+
+/* ----------------------------------------------------
+   4. Presenter Floating Toolbox (강사 전용 플로팅 판서 툴바)
+   ---------------------------------------------------- */
+#presenter-toolbar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--toolbar-bg);
+  border: 1px solid var(--toolbar-border);
+  box-shadow: var(--toolbar-shadow);
+  backdrop-filter: blur(16px);
+  border-radius: 36px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 100;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+#presenter-toolbar.hidden {
+  display: none;
+}
+
+.tool-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tool-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-color);
+  margin: 0 4px;
+}
+
+.tool-btn {
+  background: transparent;
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.tool-btn:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.tool-btn-wide {
+  width: auto;
+  min-width: 112px;
+  padding: 0 14px;
+  border-radius: 20px;
+  gap: 7px;
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.tool-btn-wide.is-sharing {
+  background: var(--accent-danger);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.28);
+}
+
+body[data-source-mode="desktop"] #presenter-toolbar .markdown-only {
+  display: none;
+}
+
+.tool-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.tool-btn.active {
+  background: var(--accent-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+}
+
+/* Color Picker Palette */
+.color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.15s ease;
+}
+
+.color-dot:hover {
+  transform: scale(1.2);
+}
+
+.color-dot.active {
+  border-color: var(--text-primary);
+  transform: scale(1.15);
+}
+
+/* ----------------------------------------------------
+   4-1. Floating Zoom Controls (화면 우측 하단 플로팅 줌 바)
+   ---------------------------------------------------- */
+.floating-zoom-bar {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 4px 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 85;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body[data-source-mode="desktop"] .floating-zoom-bar {
+  display: none !important;
+}
+
+.floating-zoom-bar .zoom-btn {
+  background: transparent;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.floating-zoom-bar .zoom-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.floating-zoom-bar .zoom-btn-label {
+  background: transparent;
+  border: none;
+  padding: 0 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+  min-width: 52px;
+  text-align: center;
+  border-radius: 12px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.floating-zoom-bar .zoom-btn-label:hover {
+  background: var(--bg-hover);
+  color: var(--accent-primary);
+}
+
+/* ----------------------------------------------------
+   5. Student Floating Action Button (강사 화면 따라가기)
+   ---------------------------------------------------- */
+#btn-catch-up {
+  position: fixed;
+  bottom: 80px; /* 줌 바 위에 배치 */
+  right: 24px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 30px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 10px 25px -3px rgba(37, 99, 235, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 90;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: catch-up-emphasis 2.4s ease-out infinite;
+}
+
+#btn-catch-up:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 15px 30px -3px rgba(37, 99, 235, 0.65);
+}
+
+#btn-catch-up.hidden {
+  display: none;
+}
+
+@keyframes catch-up-emphasis {
+  0%, 100% { box-shadow: 0 10px 25px -3px rgba(37, 99, 235, 0.42); }
+  50% { box-shadow: 0 13px 30px -3px rgba(37, 99, 235, 0.62); }
+}
+
+/* ----------------------------------------------------
+   6. Modal Dialogs & Toast Notifications
+   ---------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 28px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: var(--toolbar-shadow);
+  transform: scale(0.95);
+  transition: transform 0.2s ease;
+}
+
+.modal-overlay.active .modal-card {
+  transform: scale(1);
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.modal-desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  outline: none;
+}
+
+.modal-input:focus {
+  border-color: var(--accent-primary);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-primary {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Toast Notifications */
+#toast-container {
+  position: fixed;
+  top: 70px;
+  right: 24px;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slide-in 0.25s ease-out;
+}
+
+@keyframes slide-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Responsive adjustments for Mobile & Tablets */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 280px;
+    --header-height: 52px;
+  }
+
+  #main-header {
+    padding: 0 8px;
+  }
+
+  .header-left,
+  .header-center,
+  .header-right {
+    gap: 6px;
+  }
+
+  .sync-toggle-container > span:first-child,
+  #client-count-badge,
+  #btn-share-link,
+  #btn-theme-toggle {
+    display: none;
+  }
+
+  #btn-presenter-login {
+    min-width: 34px;
+    padding: 6px 8px;
+    font-size: 0;
+  }
+
+  #btn-presenter-login i {
+    font-size: 0.9rem;
+  }
+
+  /* 1) 모바일 사이드바: 뷰어를 밀어내지 않고 오버레이(Drawer)로 작동 */
+  #sidebar {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    height: calc(100vh - var(--header-height));
+    z-index: 150;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
+    transition: transform 0.25s ease;
+    transform: translateX(0);
+    margin-left: 0 !important;
+  }
+
+  #sidebar.collapsed {
+    transform: translateX(-100%) !important;
+  }
+
+  /* 2) 모바일 뷰어: 전체 너비 100% 확보 */
+  #viewer-container {
+    width: 100vw;
+    padding: 0;
+  }
+
+  #content-zoom-wrapper {
+    padding: 16px 8px 90px 8px;
+    width: 100%;
+  }
+
+  #document-canvas-host {
+    padding: 20px 14px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 100%;
+    min-height: auto;
+  }
+
+  #markdown-content {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    word-break: break-word;
+  }
+
+  #markdown-content pre {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  /* 3) 헤더 모바일 최적화 */
+  .brand-logo span:not(.brand-badge) {
+    display: none; /* 모바일에서 텍스트 숨기고 아이콘+배지만 */
+  }
+
+  .current-doc-badge {
+    max-width: 130px;
+    font-size: 0.78rem;
+    padding: 4px 8px;
+  }
+
+  .status-pill {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+  }
+
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .desktop-share-state {
+    padding: 24px 18px;
+  }
+
+  .desktop-live-badge {
+    top: 12px;
+    left: 12px;
+  }
+
+  /* 4) 모바일 따라가기 플로팅 버튼 */
+  #btn-catch-up {
+    bottom: 20px;
+    right: 16px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 540px) {
+  .current-doc-badge {
+    display: none;
+  }
+
+  .status-pill {
+    padding: 4px 8px;
+    font-size: 0.74rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

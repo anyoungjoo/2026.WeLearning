@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="KBS 청주방송총국 AI 바이브 코딩 교육 안내">
+  <title>KBS AI 바이브 코딩 교육 안내</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #182026;
+      --muted: #53606b;
+      --faint: #9aa5ad;
+      --paper: #ffffff;
+      --wash: #f6f5f0;
+      --line: #dbd8ce;
+      --line-dark: #182026;
+      --signal: #d44d24;
+      --signal-soft: #fbf0ec;
+      --blue: #1d3f5e;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    html {
+      background: #e2e1db;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px 0;
+      color: var(--ink);
+      background: #e2e1db;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif;
+      font-synthesis: none;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      word-break: keep-all;
+    }
+
+    ::selection {
+      color: var(--white);
+      background: var(--blue);
+    }
+
+    /* A4 Sheet Container (210mm x 297mm) */
+    .sheet {
+      width: 210mm;
+      height: 297mm;
+      max-height: 297mm;
+      margin: 0 auto;
+      padding: 13mm 15mm 11mm;
+      background: var(--paper);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .masthead,
+    .hero,
+    .outcome,
+    .learning-route,
+    .details,
+    .closing,
+    .footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Masthead */
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 4mm;
+      border-bottom: 1px solid var(--line-dark);
+      color: var(--blue);
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+
+    .masthead p { margin: 0; }
+
+    .masthead .division {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 5.5mm 0 4.5mm;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    .hero h1 {
+      font-size: 27px;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 1.25;
+      color: var(--ink);
+    }
+
+    .hero h1 em {
+      color: var(--signal);
+      font-style: normal;
+    }
+
+    .hero-bottom {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 7mm;
+      align-items: baseline;
+      margin-top: 4.5mm;
+    }
+
+    .course-name {
+      color: var(--blue);
+      font-size: 13.5px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .intro {
+      padding-left: 3.5mm;
+      border-left: 1.5px solid var(--signal);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.6;
+    }
+
+    /* Outcome (교육 후 남는 것) */
+    .outcome {
+      display: grid;
+      grid-template-columns: 28mm 1fr;
+      gap: 5mm;
+      padding: 4.5mm 0;
+      border-top: 2px solid var(--signal);
+      border-bottom: 1px solid var(--line-dark);
+      align-items: baseline;
+    }
+
+    .outcome-label {
+      color: var(--signal);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.4;
+    }
+
+    .outcome-copy strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.35;
+      color: var(--ink);
+    }
+
+    .outcome-copy p {
+      margin-top: 1.8mm;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.55;
+    }
+
+    /* Learning Route */
+    .learning-route {
+      padding-top: 4mm;
+    }
+
+    .section-title {
+      color: var(--ink);
+      font-size: 14.5px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    .route-list {
+      list-style: none;
+      margin: 3.5mm 0 0;
+      padding: 0;
+      border-top: 1px solid var(--line-dark);
+    }
+
+    .route-list li {
+      display: grid;
+      grid-template-columns: 12mm 42mm 1fr;
+      gap: 3.5mm;
+      align-items: baseline;
+      padding: 3mm 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .route-number {
+      color: var(--signal);
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .route-title {
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.35;
+    }
+
+    .route-detail {
+      color: var(--muted);
+      font-size: 10.8px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .route-detail strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    /* Details (2-Column Spec) */
+    .details {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 7mm;
+      padding-top: 4mm;
+    }
+
+    .details-section {
+      padding-top: 3mm;
+      border-top: 1px solid var(--line-dark);
+    }
+
+    .details-section h2 {
+      margin-bottom: 3mm;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    .facts { margin: 0; }
+
+    .facts > div {
+      display: grid;
+      grid-template-columns: 14mm 1fr;
+      gap: 2mm;
+      padding: 2.2mm 0;
+      border-bottom: 1px solid var(--line);
+      align-items: baseline;
+    }
+
+    .facts dt {
+      color: var(--blue);
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.45;
+    }
+
+    .facts dd {
+      margin: 0;
+      color: var(--ink);
+      font-size: 10.8px;
+      font-weight: 600;
+      line-height: 1.48;
+    }
+
+    .placeholder {
+      display: inline;
+      color: var(--signal);
+      font-weight: 700;
+      text-decoration: underline;
+      text-decoration-color: rgba(212, 77, 36, 0.4);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .audience-list,
+    .benefit-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .audience-list li,
+    .benefit-list li {
+      position: relative;
+      padding: 0 0 2.2mm 3.8mm;
+      color: var(--muted);
+      font-size: 10.8px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .audience-list li::before,
+    .benefit-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.6em;
+      width: 4px;
+      height: 4px;
+      background: var(--signal);
+      border-radius: 1px;
+    }
+
+    .audience-list strong,
+    .benefit-list strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .benefits {
+      margin-top: 2.5mm;
+      padding-top: 2.8mm;
+      border-top: 1px solid var(--line);
+    }
+
+    .benefits h3 {
+      margin-bottom: 2mm;
+      color: var(--signal);
+      font-size: 10.8px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    /* Closing */
+    .closing {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6mm;
+      align-items: center;
+      margin-top: 2mm;
+      padding: 3.8mm 0;
+      border-top: 1.5px solid var(--blue);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .closing p {
+      color: var(--ink);
+      font-size: 11.8px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.5;
+    }
+
+    .closing small {
+      display: block;
+      margin-top: 1mm;
+      color: var(--muted);
+      font-size: 9.8px;
+      font-weight: 500;
+    }
+
+    .ready-mark {
+      width: 19mm;
+      height: 19mm;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--signal);
+      border-radius: 50%;
+      color: var(--signal);
+      font-size: 8.8px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      text-align: center;
+      transform: rotate(-6deg);
+    }
+
+    /* Footer */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 6mm;
+      padding-top: 3.5mm;
+      color: var(--muted);
+      font-size: 9.5px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .footer strong {
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    /* Responsive */
+    @media screen and (max-width: 760px) {
+      body { padding: 0; background: var(--paper); }
+      .sheet {
+        width: 100%;
+        min-height: 100vh;
+        height: auto;
+        max-height: none;
+        padding: 7vw 6vw;
+        box-shadow: none;
+      }
+      .hero-bottom,
+      .details,
+      .closing { grid-template-columns: 1fr; }
+      .route-list li { grid-template-columns: 10mm 1fr; gap: 2mm; }
+      .route-detail { grid-column: 2; }
+      .ready-mark { display: none; }
+      .footer { flex-direction: column; gap: 1mm; }
+    }
+
+    /* Print Setting */
+    @media print {
+      html, body { background: var(--paper); }
+      body { padding: 0; }
+      .sheet {
+        width: 210mm;
+        height: 297mm;
+        max-height: 297mm;
+        margin: 0;
+        padding: 12mm 14mm 10mm;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!--
+  THESIS: One A4 training brief that treats the course as a practical production call sheet, not a deck of feature cards.
+  OWN-WORLD: Warm off-white paper, ink-blue rules, signal-orange annotations, editorial serif display, and precise document rhythm.
+  STORY: An employee sees the real outcome first, follows the three practice stages, then finds eligibility and attendance details without hunting.
+  FIRST VIEWPORT: A slim KBS masthead leads into a large two-line promise; the outcome statement follows immediately in a ruled horizontal block.
+  FORM: Education brief / broadcast call sheet, grounded candidate 3, seed 087e2404.
+  FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+  -->
+  <main class="sheet" aria-labelledby="education-title">
+    <header class="masthead">
+      <p>KBS 청주방송총국</p>
+      <p class="division">2026년 하반기 위러닝 교육</p>
+    </header>
+
+    <section class="hero" aria-labelledby="education-title">
+      <h1 id="education-title">AI로, <em>반복 업무</em>를<br>내 손의 도구로.</h1>
+      <div class="hero-bottom">
+        <p class="course-name">업무 자동화를 위한 AI 바이브 코딩 교육</p>
+        <p class="intro">코드를 외우는 대신, AI에게 맥락과 지시를 명확히 전달합니다. 비전공자도 실제 업무에 쓰는 자동화 도구를 직접 완성합니다.</p>
+      </div>
+    </section>
+
+    <section class="outcome" aria-label="교육 후 결과물">
+      <p class="outcome-label">교육 후<br>남는 것</p>
+      <div class="outcome-copy">
+        <strong>사내 ERP 반복 입력 자동화<br>크롬 확장 프로그램 <span style="font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: -0.01em;">(+폰에서 실행가능한 나만의 앱을 무료로 개발하기! 📱)</span></strong>
+        <p>AI 대화법을 익히고, 함께 기능을 만들고, 클릭 한 번으로 반복 입력을 줄이는 나만의 실무 도구까지 완성합니다.</p>
+      </div>
+    </section>
+
+    <section class="learning-route" aria-labelledby="route-title">
+      <h2 class="section-title" id="route-title">이해에서 실무 완성까지</h2>
+      <ol class="route-list">
+        <li>
+          <div class="route-number">01</div>
+          <h3 class="route-title">AI와 대화하는 법</h3>
+          <p class="route-detail">AI가 <strong>찰떡같이 알아듣는 대화 요령</strong>을 익힙니다. 어려운 기술 없이, 한국어로 편하게 질문하고 원하는 답을 정확히 얻어내는 법을 배웁니다.</p>
+        </li>
+        <li>
+          <div class="route-number">02</div>
+          <h3 class="route-title">나만의 AI 어플 만들기</h3>
+          <p class="route-detail">내 <strong>휴대폰에서 실행할 수 있는 채팅 어플</strong>(AI 대화 요약 기능 탑재)을 AI와 함께 뚝딱 만들어 봅니다.</p>
+        </li>
+        <li>
+          <div class="route-number">03</div>
+          <h3 class="route-title">실무 자동화 도구 완성</h3>
+          <p class="route-detail">웹 브라우저를 직접 제어하여 사내 ERP의 반복 입력을 자동화하는 <strong>크롬 확장 프로그램</strong>을 완성합니다.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="details" aria-label="참여 안내">
+      <section class="details-section" aria-labelledby="information-title">
+        <h2 id="information-title">참여 안내</h2>
+        <dl class="facts">
+          <div>
+            <dt>대상</dt>
+            <dd>AI를 업무에 제대로 활용하고 싶은 사내 임직원 누구나</dd>
+          </div>
+          <div>
+            <dt>일시</dt>
+            <dd><span class="placeholder">2026년&nbsp;&nbsp;&nbsp;&nbsp;월&nbsp;&nbsp;&nbsp;&nbsp;일 (요일) 00:00 ~ 00:00</span></dd>
+          </div>
+          <div>
+            <dt>장소</dt>
+            <dd><span class="placeholder">사내 교육장 / 회의실 위치 입력</span></dd>
+          </div>
+          <div>
+            <dt>준비물</dt>
+            <dd>개인 노트북 필수 · 100% 실습 중심으로 진행합니다.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="details-section" aria-labelledby="fit-title">
+        <h2 id="fit-title">이 교육이 맞는 분</h2>
+        <ul class="audience-list">
+          <li>현재 AI를 써보고 있지만, <strong>남들처럼 직접 앱을 개발하고 더 깊이 활용해보고 싶은 분</strong></li>
+          <li>매일 반복되는 입력·정리 업무를 줄일 <strong>나만의 업무 자동화 도구</strong>가 필요한 분</li>
+          <li>※ <em>AI를 한 번도 사용해보지 않은 분에게는 체감 난이도가 다소 높을 수 있습니다.</em></li>
+        </ul>
+        <div class="benefits">
+          <h3>수료 후 지원</h3>
+          <ul class="benefit-list">
+            <li><strong>사내 학점 인정</strong>으로 교육 성과를 공식적으로 남깁니다.</li>
+            <li>교육 후 실무 활용을 위한 <strong>AI 유료 구독 1개월</strong>을 지원합니다.</li>
+          </ul>
+        </div>
+      </section>
+    </section>
+
+    <section class="closing" aria-label="신청 안내">
+      <div>
+        <p>AI는 만능이 아닙니다.<br>한계와 가능성을 명확히 알아야 ‘정확한 일’을 지시할 수 있습니다.</p>
+      </div>
+      <div class="ready-mark" aria-hidden="true">PRACTICE<br>READY</div>
+    </section>
+
+    <footer class="footer">
+      <span><strong>KBS 청주방송총국</strong> · 2026년 하반기 위러닝</span>
+      <span>문의: 기술국 권영부 </span>
+    </footer>
+  </main>
+</body>
+</html>

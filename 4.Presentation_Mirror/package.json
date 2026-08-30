@@ -1,0 +1,32 @@
+{
+  "name": "presentation-mirror",
+  "version": "1.0.0",
+  "description": "실시간 마크다운 교육 발표 미러링 및 판서 시스템 (Presentation Mirror)",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test",
+    "media:up": "docker compose up -d mediamtx",
+    "media:down": "docker compose down",
+    "media:logs": "docker compose logs -f mediamtx"
+  },
+  "keywords": [
+    "presentation",
+    "markdown",
+    "realtime",
+    "socket.io",
+    "screen-mirroring",
+    "whiteboard",
+    "education"
+  ],
+  "author": "KBS AI 교육팀",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mime-types": "^2.1.35",
+    "socket.io": "^4.8.1"
+  }
+}

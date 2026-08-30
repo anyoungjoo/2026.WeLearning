@@ -1,0 +1,6 @@
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:1.20.1
+    container_name: presentation-mirror-media
+    network_mode: host
+    restart: unless-stopped

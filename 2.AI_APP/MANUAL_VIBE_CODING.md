@@ -184,7 +184,7 @@ http://localhost:4000/api/chat/messages?room_id=lobby     ← 백엔드가 전�
 ### 1단계: PC 3 (Database Tier) 가동
 
 ```bash
-cd API_TEST/v1_basic/database
+cd 2.AI_APP/v1_basic/database
 npm install
 npm run init-db   # database.sqlite 생성 (⚠️ 기존 데이터가 지워집니다)
 npm start         # 5000번 포트
@@ -196,7 +196,7 @@ npm start         # 5000번 포트
 ### 2단계: PC 2 (Backend Tier) 가동
 
 ```bash
-cd API_TEST/v1_basic/backend
+cd 2.AI_APP/v1_basic/backend
 npm install
 npm start         # 4000번 포트
 ```
@@ -208,7 +208,7 @@ npm start         # 4000번 포트
 ### 3단계: PC 1 (Frontend Tier) 가동
 
 ```bash
-cd API_TEST/v1_basic/frontend
+cd 2.AI_APP/v1_basic/frontend
 npm install
 npm run dev       # 8080번 포트
 ```
@@ -265,7 +265,7 @@ npm run dev       # 8080번 포트
 ### 진행 방법
 
 ```bash
-cd API_TEST/v2_extended
+cd 2.AI_APP/v2_extended
 ```
 
 이 폴더에는 **v1_basic과 똑같은 코드**가 들어 있습니다. 여기에 기능을 얹습니다.

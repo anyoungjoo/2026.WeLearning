@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presentation Mirror - 실시간 교육 발표 미러링</title>
+  
+  <!-- Pretendard 폰트 & FontAwesome 아이콘 -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  
+  <!-- Highlight.js 테마 & 스타일 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  
+  <!-- 커스텀 스타일시트 -->
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <!--
+    THESIS: One presentation surface, with a deliberate switch from structured Markdown to the presenter's real desktop.
+    OWN-WORLD: Preserve the existing blue instructional workspace, compact controls, and clear live-status language.
+    STORY: The presenter starts a screen share, teaches in any desktop tool, and returns everyone to the document when it ends.
+    FIRST VIEWPORT: The source and live state stay legible in the header; the shared desktop owns the workspace without annotation chrome.
+    FORM: A narrow extension of the incumbent Operate surface; no new visual world or concept seed.
+    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+  -->
+  <div id="app-container">
+    <!-- ==========================================
+         1. 상단 글로벌 헤더
+         ========================================== -->
+    <header id="main-header">
+      <div class="header-left">
+        <button id="btn-toggle-sidebar" class="btn-icon" title="사이드바 열기/닫기">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="brand-logo">
+          <i class="fas fa-chalkboard-teacher text-accent"></i>
+          <span>Presentation Mirror</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <!-- 실시간 동기화 / 권한 상태 뱃지 -->
+        <div id="status-pill" class="status-pill follow-on">
+          <span class="pulse-dot"></span>
+          <span>강사 동기화 중</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- 수강생용 동기화 On/Off 스위치 -->
+        <label class="sync-toggle-container" title="강사 화면 동기화 켜기/끄기">
+          <span>동기화</span>
+          <div class="toggle-switch">
+            <input type="checkbox" id="sync-mode-toggle" checked>
+            <span class="slider"></span>
+          </div>
+        </label>
+
+        <!-- 접속자 수 뱃지 -->
+        <div id="client-count-badge" class="btn-icon" style="cursor: default;" title="현재 접속자 수">
+          <i class="fas fa-users"></i> 1명
+        </div>
+
+        <!-- 접속 주소 안내 / 공유 버튼 -->
+        <button id="btn-share-link" class="btn-icon" title="수강생 접속 주소(Host IP) 확인">
+          <i class="fas fa-wifi"></i> <span class="hide-mobile">접속 주소</span>
+        </button>
+
+        <!-- 테마 전환 버튼 (다크/라이트) -->
+        <button id="btn-theme-toggle" class="btn-icon" title="테마 전환">
+          <i class="fas fa-moon"></i>
+        </button>
+
+        <!-- 강사 모드 로그인/종료 버튼 -->
+        <button id="btn-presenter-login" class="btn-icon btn-presenter-nav" style="color: var(--accent-primary); font-weight:600;">
+          <i class="fas fa-chalkboard-teacher"></i> <span>강사 모드</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ==========================================
+         2. 메인 바디 (사이드바 + 마크다운 & 판서 뷰어)
+         ========================================== -->
+    <main id="main-body">
+      <!-- 좌측 교육자료 파일 탐색기 사이드바 -->
+      <aside id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-title">
+            <i class="fas fa-folder-tree"></i>
+            <span>교육자료 목차</span>
+          </div>
+          <div class="sidebar-header-actions">
+            <button id="btn-tree-toggle-all" class="btn-icon btn-sm" title="모두 접기 / 모두 펴기">
+              <i class="fas fa-layer-group"></i> <span id="tree-toggle-text">모두 접기</span>
+            </button>
+            <button id="btn-close-sidebar" class="btn-icon btn-sm" title="사이드바 닫기">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+          </div>
+        </div>
+        <div class="sidebar-search">
+          <input type="text" id="sidebar-search-input" placeholder="문서 검색 (예: 마크다운, 컨텍스트)..." />
+        </div>
+        <div id="sidebar-tree" class="sidebar-tree">
+          <!-- JS로 동적 렌더링 -->
+        </div>
+      </aside>
+
+      <!-- 중앙 뷰어 및 투명 캔버스 오버레이 영역 -->
+      <section id="viewer-container">
+        <div id="content-zoom-wrapper">
+          <div id="document-canvas-host">
+            <!-- 마크다운 본문 렌더링 영역 -->
+            <article id="markdown-content" class="markdown-body">
+              <div class="empty-state" style="text-align: center; padding: 60px 0; color: var(--text-muted);">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p style="margin-top: 16px;">교육 자료를 불러오고 있습니다...</p>
+              </div>
+            </article>
+
+            <!-- 투명 판서(Whiteboard) 오버레이 Canvas -->
+            <canvas id="whiteboard-canvas"></canvas>
+
+            <!-- 실시간 레이저 포인터 효과 도트 -->
+            <div id="laser-pointer-dot"></div>
+
+            <!-- 강사 실시간 도구 커서 포인터 (형광펜, 밑줄, 판서, 지우개) -->
+            <div id="presenter-live-cursor" class="presenter-live-cursor hidden">
+              <div class="cursor-icon-wrapper">
+                <i id="presenter-cursor-icon" class="fas fa-highlighter"></i>
+              </div>
+              <span id="presenter-cursor-badge" class="cursor-badge">강사</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 전체 데스크톱 WebRTC 시청 영역 -->
+        <section id="desktop-share-stage" class="desktop-share-stage hidden" aria-label="강사 데스크톱 화면">
+          <video id="desktop-share-video" autoplay muted playsinline></video>
+
+          <div id="desktop-share-state" class="desktop-share-state" role="status" aria-live="polite">
+            <span id="desktop-share-state-icon" class="desktop-share-state-icon"><i class="fas fa-display"></i></span>
+            <h2 id="desktop-share-state-title">강사 화면을 준비하고 있습니다</h2>
+            <p id="desktop-share-state-detail">잠시만 기다려 주세요.</p>
+            <button id="btn-retry-screen-share" class="btn-secondary hidden" type="button">
+              <i class="fas fa-rotate-right"></i> 다시 연결
+            </button>
+          </div>
+
+          <div id="desktop-live-badge" class="desktop-live-badge hidden">
+            <span class="pulse-dot"></span> LIVE · 데스크톱
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         3. 강사용 플로팅 판서 툴바 (Presenter Toolbar)
+         ========================================== -->
+    <div id="presenter-toolbar" class="hidden">
+      <!-- 도구 그룹: 선택, 형광펜, 밑줄, 자유 판서, 지우개 -->
+      <div class="tool-group markdown-only">
+        <button class="tool-btn active" data-tool="cursor" title="기본 커서 (스크롤 및 텍스트 선택)"><i class="fas fa-mouse-pointer"></i></button>
+        <button class="tool-btn" data-tool="highlight" title="CSS 텍스트 형광펜 (텍스트 드래그)"><i class="fas fa-highlighter"></i></button>
+        <button class="tool-btn" data-tool="underline" title="CSS 텍스트 밑줄 (텍스트 드래그)"><i class="fas fa-underline"></i></button>
+        <button class="tool-btn" data-tool="draw" title="자유 판서 드로잉 (블록 앵커 기준)"><i class="fas fa-paint-brush"></i></button>
+        <button class="tool-btn" data-tool="eraser" title="지우개 (마킹 클릭 또는 판서 지우기)"><i class="fas fa-eraser"></i></button>
+      </div>
+
+      <div class="tool-divider markdown-only"></div>
+
+      <!-- 색상 팔레트 -->
+      <div class="tool-group markdown-only">
+        <div class="color-dot active" data-color="#ef4444" style="background: #ef4444;" title="빨강"></div>
+        <div class="color-dot" data-color="#3b82f6" style="background: #3b82f6;" title="파랑"></div>
+        <div class="color-dot" data-color="#eab308" style="background: #eab308;" title="노랑"></div>
+        <div class="color-dot" data-color="#10b981" style="background: #10b981;" title="초록"></div>
+        <div class="color-dot" data-color="#ffffff" style="background: #ffffff; border: 1px solid #cbd5e1;" title="흰색"></div>
+      </div>
+
+      <div class="tool-divider markdown-only"></div>
+
+      <!-- 보조 도구: Undo, Clear, 이전/다음 문서, 전체화면 -->
+      <div class="tool-group markdown-only">
+        <button id="tool-btn-undo" class="tool-btn" title="실행 취소 (Ctrl+Z)"><i class="fas fa-undo"></i></button>
+        <button id="tool-btn-clear" class="tool-btn" title="판서 전체 지우기"><i class="fas fa-trash-alt"></i></button>
+        <button id="tool-btn-prev" class="tool-btn" title="이전 문서 (단축키 [)"><i class="fas fa-chevron-left"></i></button>
+        <button id="tool-btn-next" class="tool-btn" title="다음 문서 (단축키 ])"><i class="fas fa-chevron-right"></i></button>
+      </div>
+
+      <div class="tool-divider"></div>
+
+      <div class="tool-group">
+        <button id="tool-btn-screen-share" class="tool-btn tool-btn-wide" type="button" title="전체 데스크톱 화면 공유" aria-pressed="false">
+          <i class="fas fa-display"></i><span>화면 공유</span>
+        </button>
+        <button id="tool-btn-fullscreen" class="tool-btn" title="전체화면 프레젠테이션 (단축키 F)"><i class="fas fa-expand"></i></button>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         4. 플로팅 줌(Zoom) 컨트롤 바 (우측 하단)
+         ========================================== -->
+    <div id="floating-zoom-controls" class="floating-zoom-bar markdown-only">
+      <button id="btn-zoom-out" class="zoom-btn" title="화면 축소"><i class="fas fa-minus"></i></button>
+      <button id="btn-zoom-reset" class="zoom-btn-label" title="100%로 초기화"><span id="zoom-level-display">100%</span></button>
+      <button id="btn-zoom-in" class="zoom-btn" title="화면 확대"><i class="fas fa-plus"></i></button>
+    </div>
+
+    <!-- ==========================================
+         5. 수강생용 즉시 복귀 플로팅 버튼 (Catch Up)
+         ========================================== -->
+    <button id="btn-catch-up" class="hidden" title="강사가 현재 진행 중인 화면으로 복귀합니다">
+      <i class="fas fa-bolt"></i>
+      <span>강사 화면 따라가기</span>
+    </button>
+
+    <!-- ==========================================
+         5. 강사 인증 모달 (PIN Code Modal)
+         ========================================== -->
+    <div id="modal-presenter-auth" class="modal-overlay">
+      <div class="modal-card">
+        <h3 class="modal-title"><i class="fas fa-key text-accent"></i> 강사 모드 인증</h3>
+        <p class="modal-desc">실시간 화면 동기화 및 판서 제어 권한을 획득하기 위해 강사 PIN 번호를 입력해 주세요. (기본 PIN: <code>1234</code>)</p>
+        <input type="password" id="input-presenter-pin" class="modal-input" placeholder="PIN 번호 입력" autofocus />
+        <div class="modal-actions">
+          <button id="btn-pin-cancel" class="btn-secondary">취소</button>
+          <button id="btn-pin-submit" class="btn-primary">인증하기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         6. 접속 주소(Host IP) 안내 모달
+         ========================================== -->
+    <div id="modal-host-ips" class="modal-overlay">
+      <div class="modal-card" style="max-width: 480px;">
+        <h3 class="modal-title"><i class="fas fa-network-wired text-accent"></i> 수강생 접속 주소 안내</h3>
+        <p class="modal-desc">동일한 사내 Wi-Fi 또는 네트워크에 연결된 수강생들은 아래 주소로 접속할 수 있습니다:</p>
+        <div id="host-ip-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+          <!-- JS로 동적 생성 -->
+        </div>
+        <div class="modal-actions">
+          <button id="btn-host-modal-close" class="btn-primary">닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         7. 토스트 알림 컨테이너
+         ========================================== -->
+    <div id="toast-container"></div>
+  </div>
+
+  <!-- 외부 라이브러리 스크립트 -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.8.0/dist/mermaid.min.js"></script>
+  
+  <!-- 메인 모듈 애플리케이션 진입점 -->
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
