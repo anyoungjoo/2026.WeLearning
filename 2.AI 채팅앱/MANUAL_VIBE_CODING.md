@@ -5,15 +5,15 @@
 **바이브 코딩으로 AI 요약 기능까지 직접 확장(1차 ➡️ 2차)** 해 보는 **실무형 협업 지침서**입니다.
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                                                                  │
-│   1차 (v1_basic)     이미 완성된 채팅앱을 "실행하고 관찰"한다      │
-│        ↓                 → 3계층이 어떻게 연결되는지 눈으로 확인   │
-│                                                                  │
-│   2차 (v2_extended)  AI에게 계획서를 주고 "직접 확장"한다          │
-│                          → /요약 기능을 3계층에 걸쳐 만들어 본다   │
-│                                                                  │
-└──────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│                                                                            │
+│   1차 (v1_채팅앱(AI기능 X))  이미 완성된 채팅앱을 "실행하고 관찰"한다          │
+│        ↓                         → 3계층이 어떻게 연결되는지 눈으로 확인   │
+│                                                                            │
+│   2차 (v2_채팅앱(AI기능 O))  AI에게 계획서를 주고 "직접 확장"한다              │
+│                                  → /요약 기능을 3계층에 걸쳐 만들어 본다   │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -46,14 +46,14 @@ sequenceDiagram
     Note over PC3: DB 관리자는 VS Code 'SQLite Viewer'로 database.sqlite 실시간 관찰
 ```
 
-> ### ⭐ v1_basic의 핵심 관찰 포인트
+> ### ⭐ v1_채팅앱(AI기능 X)의 핵심 관찰 포인트
 > **채팅 메시지는 화면에만 뜨는 게 아니라 반드시 DB를 거칩니다.**
 > 11번 단계가 없으면 12번(브로드캐스트)도 일어나지 않습니다.
 > 즉 **DB Tier(5000)를 끄면 채팅이 멈춥니다.** 직접 꺼 보십시오. 그게 3-Tier입니다.
 
 ---
 
-## 🗄 2. 데이터베이스 구조 (v1_basic)
+## 🗄 2. 데이터베이스 구조 (v1_채팅앱(AI기능 X))
 
 `database/database.sqlite` 는 **진짜 SQLite 파일**입니다.
 Node.js 내장 모듈 `node:sqlite` 를 쓰므로 **별도 설치가 필요 없습니다.**
@@ -92,7 +92,7 @@ chat_messages (
 ### 💡 그래서 v1의 채팅 화면에는 시각이 안 나옵니다
 
 ```
-┌─ v1_basic 채팅창 ────────────────────┐        ┌─ v2_extended 완성 후 ────────────────┐
+┌─ v1_채팅앱(AI기능 X) ─────────────────┐        ┌─ v2_채팅앱(AI기능 O) 완성 후 ────────┐
 │  홍길동                        #1    │        │  홍길동                       15:10  │
 │  오늘 회의는 3시입니다                │        │  오늘 회의는 3시입니다                │
 │                                      │        │                                      │
@@ -150,7 +150,7 @@ http://localhost:4000/api/chat/messages?room_id=lobby     ← 백엔드가 전�
 
 ## 📊 4. 1차 기본 vs 2차 확장 비교
 
-| 비교 항목 | **1차 기본** (`v1_basic`) | **2차 확장** (`v2_extended`) |
+| 비교 항목 | **1차 기본** (`v1_채팅앱(AI기능 X)`) | **2차 확장** (`v2_채팅앱(AI기능 O)`) |
 |---|---|---|
 | **누가 만드나** | ✅ 이미 완성됨 (실행하고 관찰만) | 🤖 **AI가 만든다** (계획서를 주고 시킨다) |
 | **🗄️ DB 테이블** | `users` `reports` `chat_rooms` `chat_messages` | **+ `settings`** (API 키 보관)<br>**+ `summaries`** (요약 결과 보관) |
@@ -167,9 +167,9 @@ http://localhost:4000/api/chat/messages?room_id=lobby     ← 백엔드가 전�
 
 | 역할 | 담당 PC | 실행 디렉토리 | 포트 | 핵심 업무 |
 |---|---|---|:---:|---|
-| **Developer A**<br>(Frontend) | PC 1 | `v1_basic/frontend` | `8080` | • 사용자 UI 접속<br>• **Chrome DevTools(F12)로 에러 관찰** |
-| **Developer B**<br>(Backend) | PC 2 | `v1_basic/backend` | `4000` | • REST API & 대시보드 운영<br>• **터미널 로그로 에러 관찰** |
-| **Developer C**<br>(Database) | PC 3 | `v1_basic/database` | `5000` | • DB Gateway 운영<br>• **SQLite Viewer로 데이터 관찰** |
+| **Developer A**<br>(Frontend) | PC 1 | `v1_채팅앱(AI기능 X)/frontend` | `8080` | • 사용자 UI 접속<br>• **Chrome DevTools(F12)로 에러 관찰** |
+| **Developer B**<br>(Backend) | PC 2 | `v1_채팅앱(AI기능 X)/backend` | `4000` | • REST API & 대시보드 운영<br>• **터미널 로그로 에러 관찰** |
+| **Developer C**<br>(Database) | PC 3 | `v1_채팅앱(AI기능 X)/database` | `5000` | • DB Gateway 운영<br>• **SQLite Viewer로 데이터 관찰** |
 
 > 💡 **혼자 실습하는 경우**: 터미널 3개를 열어 한 PC에서 전부 돌리면 됩니다.
 > 💡 **다른 PC와 연결하는 경우**: 백엔드 실행 시 `DB_HOST=http://<DB PC의 IP>:5000` 환경변수를 지정합니다.
@@ -184,7 +184,7 @@ http://localhost:4000/api/chat/messages?room_id=lobby     ← 백엔드가 전�
 ### 1단계: PC 3 (Database Tier) 가동
 
 ```bash
-cd 2.AI_APP/v1_basic/database
+cd "2.AI 채팅앱/v1_채팅앱(AI기능 X)/database"
 npm install
 npm run init-db   # database.sqlite 생성 (⚠️ 기존 데이터가 지워집니다)
 npm start         # 5000번 포트
@@ -196,7 +196,7 @@ npm start         # 5000번 포트
 ### 2단계: PC 2 (Backend Tier) 가동
 
 ```bash
-cd 2.AI_APP/v1_basic/backend
+cd "2.AI 채팅앱/v1_채팅앱(AI기능 X)/backend"
 npm install
 npm start         # 4000번 포트
 ```
@@ -208,7 +208,7 @@ npm start         # 4000번 포트
 ### 3단계: PC 1 (Frontend Tier) 가동
 
 ```bash
-cd 2.AI_APP/v1_basic/frontend
+cd "2.AI 채팅앱/v1_채팅앱(AI기능 X)/frontend"
 npm install
 npm run dev       # 8080번 포트
 ```
@@ -265,13 +265,13 @@ npm run dev       # 8080번 포트
 ### 진행 방법
 
 ```bash
-cd 2.AI_APP/v2_extended
+cd "2.AI 채팅앱/v2_채팅앱(AI기능 O)"
 ```
 
-이 폴더에는 **v1_basic과 똑같은 코드**가 들어 있습니다. 여기에 기능을 얹습니다.
+이 폴더에는 **v1_채팅앱(AI기능 X)과 똑같은 코드**가 들어 있습니다. 여기에 기능을 얹습니다.
 
 ```
-v2_extended/
+v2_채팅앱(AI기능 O)/
 ├── DEVELOPMENT_PLAN.md   ⭐ AI에게 줄 개발계획서 (이게 핵심)
 ├── AGENTS.md             ⭐ AI가 지켜야 할 규칙 (Antigravity Rules에 등록)
 ├── frontend/
@@ -279,7 +279,7 @@ v2_extended/
 └── database/
 ```
 
-**① Antigravity 로 `v2_extended` 폴더를 엽니다.**
+**① Antigravity 로 `v2_채팅앱(AI기능 O)` 폴더를 엽니다.**
 
 **② `AGENTS.md` 를 Custom Rules 에 등록합니다.**
 > `…` → Customizations → Rules → `+ Workspace` → 내용 붙여넣기 → **Always On**
@@ -325,14 +325,14 @@ v2_extended/
         ⭐ 그래서 SQLite Viewer 에서 timestamp 값을 손으로 고칩니다.
            09:05 / 15:10 / 16:40 / 18:20 … 이렇게 흩뿌려 놓습니다.
 
-           그런 다음 /요약 15:00-17:00 을 실행하면
+            그런 다음 /요약 15:00-17:00 을 실행하면
            → 6건 중 3건만 요약됩니다.
 
            이때 "id 순서"와 "시간 순서"가 서로 어긋나는 것을 보게 됩니다.
            → DB는 마법 상자가 아니라 내가 고칠 수 있는 표라는 것을 손으로 배웁니다.
 ```
 
-📄 **상세 절차는 [v2_extended/DEVELOPMENT_PLAN.md](./v2_extended/DEVELOPMENT_PLAN.md) 에 전부 적혀 있습니다.**
+📄 **상세 절차는 [v2_채팅앱(AI기능 O)/DEVELOPMENT_PLAN.md](./v2_채팅앱(AI기능%20O)/DEVELOPMENT_PLAN.md) 에 전부 적혀 있습니다.**
 
 ---
 
@@ -354,7 +354,7 @@ v2_extended/
 
 | 문서 | 내용 |
 |---|---|
-| [v2_extended/DEVELOPMENT_PLAN.md](./v2_extended/DEVELOPMENT_PLAN.md) | **2차 실습 개발계획서** (AI에게 주는 지시서) |
-| [v2_extended/AGENTS.md](./v2_extended/AGENTS.md) | AI가 지켜야 할 프로젝트 규칙 |
-| [1-1. 교육준비물.md](../docs/교육자료%20배포/1-1.%20교육준비물.md) | 개발 환경 설치 · OpenRouter 가입 |
-| [3-0. CONTEXT_관리.md](../docs/교육자료%20배포/3-0.%20CONTEXT_관리.md) | 모델 스펙 읽는 법 · Context 관리 |
+| [v2_채팅앱(AI기능 O)/DEVELOPMENT_PLAN.md](./v2_채팅앱(AI기능%20O)/DEVELOPMENT_PLAN.md) | **2차 실습 개발계획서** (AI에게 주는 지시서) |
+| [v2_채팅앱(AI기능 O)/AGENTS.md](./v2_채팅앱(AI기능%20O)/AGENTS.md) | AI가 지켜야 할 프로젝트 규칙 |
+| [1-1. 교육준비물.md](../1.교육자료/기본_AI%20이해/1-1.%20교육준비물.md) | 개발 환경 설치 · OpenRouter 가입 |
+| [3-0. CONTEXT_관리.md](../1.교육자료/기본_AI%20이해/3-0.%20CONTEXT_관리.md) | 모델 스펙 읽는 법 · Context 관리 |

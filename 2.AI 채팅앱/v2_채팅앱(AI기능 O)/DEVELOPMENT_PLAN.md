@@ -1,4 +1,4 @@
-# 🚀 v2_extended 개발계획서 — 복사·붙여넣기로 만드는 채팅 요약 기능
+# 🚀 v2_채팅앱(AI기능 O) 개발계획서 — 복사·붙여넣기로 만드는 채팅 요약 기능
 
 > **여러분은 코드를 한 줄도 짜지 않습니다.**
 > 아래에 나오는 **회색 상자**를 위에서부터 순서대로 **복사(Ctrl+C) → AI 채팅창에 붙여넣기(Ctrl+V) → Enter**.
@@ -73,7 +73,7 @@
 
 # 0단계 — 규칙 등록 (딱 한 번, 2분)
 
-## ① Antigravity 로 `v2_extended` 폴더를 엽니다
+## ① Antigravity 로 `v2_채팅앱(AI기능 O)` 폴더를 엽니다
 
 ## ② 규칙 파일을 등록합니다
 
@@ -206,15 +206,15 @@ backend/ 와 database/ 폴더는 절대 열지 마.
 ## ② 💻 터미널에 붙여넣기 — 터미널 3개를 각각 엽니다
 
 ```bash
-cd v2_extended/database && npm install && npm run init-db && npm start
+cd "v2_채팅앱(AI기능 O)/database" && npm install && npm run init-db && npm start
 ```
 
 ```bash
-cd v2_extended/backend && npm install && npm start
+cd "v2_채팅앱(AI기능 O)/backend" && npm install && npm start
 ```
 
 ```bash
-cd v2_extended/frontend && npm install && npm run dev
+cd "v2_채팅앱(AI기능 O)/frontend" && npm install && npm run dev
 ```
 
 ## ③ 👀 확인 — Chrome 에서 `F12`
