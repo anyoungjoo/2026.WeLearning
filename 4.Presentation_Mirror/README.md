@@ -162,3 +162,12 @@ npm run media:down
 - **화면 선택 창이 열리지 않음:** 강사 주소가 `localhost` 또는 HTTPS인지 확인합니다.
 - **수강생 화면이 연결 중에서 멈춤:** `docker compose ps`에서 MediaMTX가 실행 중인지 확인합니다.
 - **영상은 보이지만 커서가 없음:** 브라우저 또는 운영체제 캡처 정책에 따라 커서 옵션이 무시될 수 있으므로 Chrome/Edge의 전체 화면 공유로 다시 확인합니다.
+
+---
+
+## 🌐 8. 클라우드 배포 및 무료 호스팅 가이드 (Vercel / Render / Cloudflare)
+
+Presentation Mirror의 실시간 Socket.IO 동기화 및 `1.교육자료` 서빙을 무료 클라우드(Render, Vercel, Cloudflare Tunnel)에 배포하는 상세 아키텍처 가이드는 아래 문서를 참고하세요:
+
+- 📖 **[클라우드 배포 및 호스팅 아키텍처 가이드 (ADR)](file:///home/genk/2026.Study/2026.WeLearning/docs/PRESENTATION_MIRROR_DEPLOY_GUIDE.md)**
+
