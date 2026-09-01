@@ -746,6 +746,100 @@ body.eraser-mode [data-ann-id]:hover {
   z-index: 10;
 }
 
+.desktop-share-stage video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #06080d;
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.desktop-share-stage.is-live video {
+  opacity: 1;
+}
+
+.desktop-share-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px;
+  text-align: center;
+  background: #0a0f19;
+  transition: opacity 180ms ease-out;
+}
+
+.desktop-share-stage.is-live:not(.presenter-view) .desktop-share-state {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.desktop-share-state-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 48px;
+  margin-bottom: 8px;
+  color: #93c5fd;
+  font-size: 2.1rem;
+}
+
+.desktop-share-state.is-loading .desktop-share-state-icon {
+  animation: screen-connect-pulse 1.4s ease-in-out infinite;
+}
+
+.desktop-share-state.is-error .desktop-share-state-icon {
+  color: #fca5a5;
+}
+
+.desktop-share-state h2 {
+  max-width: 28ch;
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  line-height: 1.35;
+}
+
+.desktop-share-state p {
+  max-width: 52ch;
+  color: #a8b3c4;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.desktop-share-state .btn-secondary {
+  margin-top: 12px;
+  border-color: #334155;
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+.desktop-live-badge {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  color: #f8fafc;
+  font-size: 0.82rem;
+  font-weight: 700;
+  z-index: 15;
+  backdrop-filter: blur(8px);
+}
+
+@keyframes screen-connect-pulse {
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
+
 /* ----------------------------------------------------
    3-1. Notion-Style Live Notepad Stage (실시간 노션형 라이브 노트패드)
    ---------------------------------------------------- */
@@ -1055,100 +1149,6 @@ body.eraser-mode [data-ann-id]:hover {
   outline: none;
 }
 
-.desktop-share-stage video {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: contain;
-  background: #06080d;
-  opacity: 0;
-  transition: opacity 180ms ease-out;
-}
-
-.desktop-share-stage.is-live video {
-  opacity: 1;
-}
-
-.desktop-share-state {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 32px;
-  text-align: center;
-  background: #0a0f19;
-  transition: opacity 180ms ease-out;
-}
-
-.desktop-share-stage.is-live:not(.presenter-view) .desktop-share-state {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.desktop-share-state-icon {
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 48px;
-  margin-bottom: 8px;
-  color: #93c5fd;
-  font-size: 2.1rem;
-}
-
-.desktop-share-state.is-loading .desktop-share-state-icon {
-  animation: screen-connect-pulse 1.4s ease-in-out infinite;
-}
-
-.desktop-share-state.is-error .desktop-share-state-icon {
-  color: #fca5a5;
-}
-
-.desktop-share-state h2 {
-  max-width: 28ch;
-  font-size: clamp(1.15rem, 2vw, 1.5rem);
-  line-height: 1.35;
-}
-
-.desktop-share-state p {
-  max-width: 52ch;
-  color: #a8b3c4;
-  font-size: 0.92rem;
-  line-height: 1.6;
-}
-
-.desktop-share-state .btn-secondary {
-  margin-top: 12px;
-  border-color: #334155;
-  background: #1e293b;
-  color: #f8fafc;
-}
-
-.desktop-live-badge {
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 20px;
-  color: #f8fafc;
-  font-size: 0.82rem;
-  font-weight: 700;
-  z-index: 15;
-  backdrop-filter: blur(8px);
-}
-
-@keyframes screen-connect-pulse {
-  0%, 100% { opacity: 0.55; transform: translateY(0); }
-  50% { opacity: 1; transform: translateY(-3px); }
-}
-
 /* ----------------------------------------------------
    4. Presenter Floating Toolbox (강사 전용 플로팅 판서 툴바)
    ---------------------------------------------------- */
@@ -1181,17 +1181,58 @@ body.eraser-mode [data-ann-id]:hover {
   gap: 4px;
 }
 
-.tool-btn-mode {
-  width: auto;
-  padding: 0 12px;
-  height: 36px;
-  border-radius: 18px;
-  font-size: 0.84rem;
-  font-weight: 700;
-  display: inline-flex;
+.mode-selector-group {
+  display: flex;
   align-items: center;
   gap: 6px;
+}
+
+/* 3대 모드 버튼: 교재, 라이브 노트, 화면 공유 - 완전 동일한 크기 & 아이콘 스타일 */
+.tool-btn-mode {
+  width: auto !important;
+  height: 36px !important;
+  min-width: 72px;
+  padding: 0 13px !important;
+  border-radius: 18px !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
   color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.tool-btn-mode i {
+  font-size: 0.88rem !important; /* 아이콘 크기 화면공유 버튼과 완벽 통일 */
+  line-height: 1;
+}
+
+.tool-btn-mode span {
+  font-size: 0.85rem !important;
+  white-space: nowrap;
+}
+
+.tool-btn-mode:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.tool-btn-mode.active {
+  background: var(--accent-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  border-color: transparent;
+}
+
+.tool-btn-mode.is-sharing {
+  background: var(--accent-danger) !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 10px rgba(239, 68, 68, 0.35);
 }
 
 .tool-divider {
@@ -1220,22 +1261,6 @@ body.eraser-mode [data-ann-id]:hover {
 .tool-btn:disabled {
   cursor: wait;
   opacity: 0.55;
-}
-
-.tool-btn-wide {
-  width: auto;
-  min-width: 100px;
-  padding: 0 14px;
-  border-radius: 20px;
-  gap: 7px;
-  font-size: 0.88rem;
-  font-weight: 750;
-}
-
-.tool-btn-wide.is-sharing {
-  background: var(--accent-danger);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.28);
 }
 
 body[data-source-mode="desktop"] #presenter-toolbar .markdown-only,

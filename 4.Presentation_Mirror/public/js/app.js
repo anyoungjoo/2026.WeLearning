@@ -204,7 +204,7 @@ class PresentationApp {
     }
   }
 
-  async stopDesktopShare({ announce = true } = {}) {
+  async stopDesktopShare({ announce = true, targetMode = 'markdown' } = {}) {
     if (this.isScreenShareTransitioning) return;
 
     this.isScreenShareTransitioning = true;
@@ -213,11 +213,12 @@ class PresentationApp {
     try {
       await this.screenShare.stopPublishing();
       if (this.sync.isPresenter) {
-        await this.sync.broadcastSourceMode('markdown');
+        await this.sync.broadcastSourceMode(targetMode);
       }
-      await this.applySourceMode('markdown');
+      await this.applySourceMode(targetMode);
       if (announce) {
-        this.showToast('<i class="fas fa-file-lines"></i> 화면 공유를 종료하고 문서로 돌아왔습니다.');
+        const modeLabel = targetMode === 'notepad' ? '라이브 노트' : '교재';
+        this.showToast(`<i class="fas fa-file-lines"></i> 화면 공유를 종료하고 ${modeLabel}로 돌아왔습니다.`);
       }
     } finally {
       this.isScreenShareTransitioning = false;
@@ -227,7 +228,7 @@ class PresentationApp {
 
   handleCaptureEnded() {
     if (!this.sync.isPresenter) return;
-    void this.stopDesktopShare();
+    void this.stopDesktopShare({ announce: true, targetMode: 'markdown' });
   }
 
   async applySourceMode(sourceMode) {
@@ -257,6 +258,7 @@ class PresentationApp {
     } else if (nextMode === 'notepad') {
       this.viewerConnectionGeneration += 1;
       await this.screenShare.stopViewing();
+      this.dom.desktopShareStage.classList.add('hidden');
       this.dom.desktopShareStage.className = 'desktop-share-stage hidden';
       this.dom.desktopLiveBadge.classList.add('hidden');
       this.dom.zoomWrapper.classList.add('hidden');
@@ -270,6 +272,7 @@ class PresentationApp {
       // markdown
       this.viewerConnectionGeneration += 1;
       await this.screenShare.stopViewing();
+      this.dom.desktopShareStage.classList.add('hidden');
       this.dom.desktopShareStage.className = 'desktop-share-stage hidden';
       this.dom.desktopLiveBadge.classList.add('hidden');
       if (this.dom.notepadStage) this.dom.notepadStage.classList.add('hidden');
@@ -337,6 +340,11 @@ class PresentationApp {
     const isLive = state === 'live' || state === 'presenter';
     const isPresenter = state === 'presenter';
     const isError = state === 'error';
+
+    if (this.sourceMode !== 'desktop') {
+      this.dom.desktopShareStage.className = 'desktop-share-stage hidden';
+      return;
+    }
 
     this.dom.desktopShareStage.className = [
       'desktop-share-stage',
@@ -867,11 +875,13 @@ class PresentationApp {
     // 화면 소스 모드 전환: 교재 (Markdown)
     if (this.dom.btnModeMarkdown) {
       this.dom.btnModeMarkdown.addEventListener('click', async () => {
+        if (this.sourceMode === 'markdown') return;
         if (this.sourceMode === 'desktop' || this.screenShare.publisher) {
-          await this.stopDesktopShare({ announce: false });
+          await this.stopDesktopShare({ announce: false, targetMode: 'markdown' });
+        } else {
+          await this.sync.broadcastSourceMode('markdown');
+          await this.applySourceMode('markdown');
         }
-        await this.sync.broadcastSourceMode('markdown');
-        await this.applySourceMode('markdown');
         this.showToast('📖 교육자료 교재 화면으로 전환했습니다.');
       });
     }
@@ -879,23 +889,27 @@ class PresentationApp {
     // 화면 소스 모드 전환: 라이브 노트 (Notepad)
     if (this.dom.btnModeNotepad) {
       this.dom.btnModeNotepad.addEventListener('click', async () => {
+        if (this.sourceMode === 'notepad') return;
         if (this.sourceMode === 'desktop' || this.screenShare.publisher) {
-          await this.stopDesktopShare({ announce: false });
+          await this.stopDesktopShare({ announce: false, targetMode: 'notepad' });
+        } else {
+          await this.sync.broadcastSourceMode('notepad');
+          await this.applySourceMode('notepad');
         }
-        await this.sync.broadcastSourceMode('notepad');
-        await this.applySourceMode('notepad');
         this.showToast('📝 실시간 라이브 노트패드 화면으로 전환했습니다.');
       });
     }
 
     // 화면 소스 모드 전환: 화면 공유 (Desktop)
-    this.dom.btnScreenShare.addEventListener('click', () => {
-      if (this.sourceMode === 'desktop' || this.screenShare.publisher) {
-        void this.stopDesktopShare();
-      } else {
-        void this.startDesktopShare();
-      }
-    });
+    if (this.dom.btnScreenShare) {
+      this.dom.btnScreenShare.addEventListener('click', () => {
+        if (this.sourceMode === 'desktop' || this.screenShare.publisher) {
+          void this.stopDesktopShare({ announce: true, targetMode: 'markdown' });
+        } else {
+          void this.startDesktopShare();
+        }
+      });
+    }
   }
 
   // ----------------------------------------------------
