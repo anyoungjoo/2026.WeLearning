@@ -919,13 +919,15 @@ body.eraser-mode [data-ann-id]:hover {
 
 /* 본문 스크롤 영역 */
 .notepad-content-wrapper {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
   padding: 36px 20px 140px;
   display: flex;
   justify-content: center;
   scroll-behavior: smooth;
+  box-sizing: border-box;
 }
 
 .notepad-page-card {
@@ -939,6 +941,9 @@ body.eraser-mode [data-ann-id]:hover {
   min-height: 650px;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
   transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
@@ -1005,7 +1010,10 @@ body.eraser-mode [data-ann-id]:hover {
   color: var(--text-primary);
   outline: none;
   min-height: 380px;
-  word-break: break-word;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
 }
 
 .notepad-page-editor.drag-over {
@@ -1078,6 +1086,8 @@ body.eraser-mode [data-ann-id]:hover {
   padding: 14px 18px;
   margin: 16px 0;
   color: var(--text-primary);
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .callout-icon {
@@ -1090,6 +1100,7 @@ body.eraser-mode [data-ann-id]:hover {
   flex: 1;
   font-size: 0.98rem;
   line-height: 1.6;
+  word-break: break-word;
 }
 
 .notepad-codeblock {
@@ -1101,6 +1112,8 @@ body.eraser-mode [data-ann-id]:hover {
   font-size: 0.92rem;
   overflow-x: auto;
   margin: 16px 0;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .notepad-checklist-item {
@@ -1108,6 +1121,8 @@ body.eraser-mode [data-ann-id]:hover {
   align-items: center;
   gap: 10px;
   margin: 6px 0;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .notepad-checklist-item input[type="checkbox"] {
@@ -1117,28 +1132,40 @@ body.eraser-mode [data-ann-id]:hover {
   accent-color: var(--accent-primary);
 }
 
-/* 이미지 카드 렌더링 */
+/* 이미지 카드 렌더링 - 캔버스 벗어남 방지 완벽 격리 */
 .notepad-image-card {
-  margin: 20px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin: 24px auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .notepad-image-card .image-wrapper {
-  max-width: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  display: flex !important;
+  justify-content: center !important;
+  background: var(--bg-hover) !important;
+  box-sizing: border-box !important;
 }
 
-.notepad-image-card img {
-  display: block;
-  max-width: 100%;
-  max-height: 540px;
-  object-fit: contain;
-  background: var(--bg-hover);
+.notepad-image-card img,
+.notepad-page-editor img {
+  display: block !important;
+  width: auto !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 65vh !important;
+  object-fit: contain !important;
+  border-radius: 6px !important;
+  box-sizing: border-box !important;
 }
 
 .notepad-image-card figcaption {
@@ -1147,6 +1174,8 @@ body.eraser-mode [data-ann-id]:hover {
   margin-top: 8px;
   text-align: center;
   outline: none;
+  max-width: 100%;
+  word-break: break-word;
 }
 
 /* ----------------------------------------------------

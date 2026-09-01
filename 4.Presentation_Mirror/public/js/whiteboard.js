@@ -97,10 +97,19 @@ export class WhiteboardEngine {
 
   getCanvasPoint(e) {
     const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const normX = x / (this.canvas.offsetWidth || 1);
-    const normY = y / (this.canvas.offsetHeight || 1);
+    if (rect.width <= 0 || rect.height <= 0) return { x: 0, y: 0, normX: 0, normY: 0 };
+
+    const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+
+    const relX = clientX - rect.left;
+    const relY = clientY - rect.top;
+
+    const normX = Math.min(1.0, Math.max(0.0, relX / rect.width));
+    const normY = Math.min(1.0, Math.max(0.0, relY / rect.height));
+
+    const x = normX * (this.canvas.offsetWidth || rect.width);
+    const y = normY * (this.canvas.offsetHeight || rect.height);
 
     return { x, y, normX, normY };
   }

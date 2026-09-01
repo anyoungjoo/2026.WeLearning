@@ -543,24 +543,33 @@ class PresentationApp {
       if (!this.sync.isPresenter || this.sourceMode !== 'markdown') return;
 
       const rect = host.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      if (rect.width <= 0 || rect.height <= 0) return;
 
-      if (x < 0 || y < 0 || x > host.offsetWidth || y > host.offsetHeight) {
+      const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+
+      const relX = clientX - rect.left;
+      const relY = clientY - rect.top;
+
+      if (relX < 0 || relY < 0 || relX > rect.width || relY > rect.height) {
         this.sync.broadcastCursorMove({ visible: false });
         return;
       }
 
-      const normX = x / (host.offsetWidth || 1);
-      const normY = y / (host.offsetHeight || 1);
-      const anchorBlockId = this.whiteboard.detectAnchorBlock(y);
+      // 줌 배율(Zoom Scale)에 완벽히 독립적인 0.0 ~ 1.0 상대 정규화 좌표 계산
+      const normX = relX / rect.width;
+      const normY = relY / rect.height;
 
-      let relY = 0;
+      const unscaledH = host.offsetHeight || 1;
+      const unscaledY = normY * unscaledH;
+      const anchorBlockId = this.whiteboard.detectAnchorBlock(unscaledY);
+
+      let anchorRelY = 0;
       if (anchorBlockId) {
         const anchorEl = host.querySelector(`[data-block-id="${anchorBlockId}"]`);
         if (anchorEl) {
-          const anchorNormY = anchorEl.offsetTop / (host.offsetHeight || 1);
-          relY = normY - anchorNormY;
+          const anchorNormY = anchorEl.offsetTop / unscaledH;
+          anchorRelY = normY - anchorNormY;
         }
       }
 
@@ -569,7 +578,7 @@ class PresentationApp {
         normX,
         normY,
         anchorBlockId,
-        relY,
+        relY: anchorRelY,
         tool: this.activeTool,
         color: this.activeColor,
         visible: true
