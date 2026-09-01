@@ -35,13 +35,21 @@ const io = new SocketIOServer(server, {
 const PORT = process.env.PORT || 4000;
 // 교육자료 폴더 경로 (/home/genk/2026.Study/2026.autoreport/1.교육자료)
 const MATERIALS_DIR = path.resolve(__dirname, '../1.교육자료');
+// 노트패드 이미지 업로드 디렉토리
+const UPLOADS_DIR = path.resolve(__dirname, 'public/uploads/notepad');
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
 const PRESENTER_PIN = process.env.PRESENTER_PIN || '1234'; // 강사 인증 핀코드 기본값
 const MEDIA_MTX_WEBRTC_PORT = Number(process.env.MEDIA_MTX_WEBRTC_PORT || 8889);
 const MEDIA_MTX_PATH = process.env.MEDIA_MTX_PATH || 'presentation';
 const MEDIA_MTX_WEBRTC_URL = (process.env.MEDIA_MTX_WEBRTC_URL || '').replace(/\/+$/, '');
 
+// 대용량 이미지(스크린샷 붙여넣기 등) 처리를 위한 본문 크기 제한 확장
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ----------------------------------------------------
@@ -52,9 +60,15 @@ const presentationState = {
   currentDoc: '',         // 현재 선택된 마크다운 문서 상대경로
   scrollRatio: 0,         // 강사의 현재 스크롤 백분율 (0.0 ~ 1.0)
   zoomLevel: 1.0,         // 강사의 현재 화면 확대 배율 (1.0 = 100%)
-  sourceMode: 'markdown', // 'markdown' | 'desktop'
+  sourceMode: 'markdown', // 'markdown' | 'desktop' | 'notepad'
   docStrokes: {},         // 문서별 캔버스 판서 데이터 { [docPath]: Array<Stroke> }
   docAnnotations: {},     // 문서별 CSS 텍스트 어노테이션(밑줄/형광펜) 데이터 { [docPath]: Array<Annotation> }
+  notepad: {              // 실시간 노션형 라이브 노트패드 상태
+    title: '💡 라이브 강의 요약 노트',
+    content: '<h2>📝 실시간 라이브 노트패드</h2><p>강사가 작성하는 텍스트와 클립보드로 붙여넣은 캡처 사진이 모든 수강생 화면에 실시간으로 공유됩니다.</p><blockquote>💡 Tip: 서식 툴바를 이용해 제목, 볼드, 코드블록, 체크리스트를 작성하거나 이미지를 붙여넣어 보세요!</blockquote>',
+    updatedAt: Date.now(),
+    scrollRatio: 0
+  },
   connectedClients: new Map() // connected socketId -> { role: 'presenter' | 'student', joinedAt }
 };
 
@@ -230,6 +244,61 @@ app.get('/api/runtime-config', (req, res) => {
   });
 });
 
+// 6) 실시간 노션형 라이브 노트패드 상태 조회 API
+app.get('/api/notepad', (req, res) => {
+  res.json({
+    success: true,
+    notepad: presentationState.notepad
+  });
+});
+
+// 7) 실시간 노션형 노트패드 이미지 업로드 API (클립보드 붙여넣기 및 파일 드롭)
+app.post('/api/notepad/upload', (req, res) => {
+  try {
+    const { image, filename } = req.body;
+    if (!image) {
+      return res.status(400).json({ success: false, message: '이미지 데이터가 전달되지 않았습니다.' });
+    }
+
+    // 1단계: Data URL 헤더 파싱 (예: "data:image/png;base64,....")
+    const match = image.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
+    if (!match) {
+      return res.status(400).json({ success: false, message: '유효한 Base64 이미지 포맷이 아닙니다.' });
+    }
+
+    const mimeType = match[1].toLowerCase();
+    const base64Data = match[2];
+
+    // 2단계: 안전한 이미지 확장자 검증
+    let ext = 'png';
+    if (mimeType.includes('jpeg') || mimeType.includes('jpg')) ext = 'jpg';
+    else if (mimeType.includes('gif')) ext = 'gif';
+    else if (mimeType.includes('webp')) ext = 'webp';
+    else if (mimeType.includes('svg')) ext = 'svg';
+
+    // 3단계: 안전한 고유 파일명 생성 및 파일 쓰기
+    const timestamp = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const safeFileName = `note-img-${timestamp}-${randomSuffix}.${ext}`;
+    const filePath = path.join(UPLOADS_DIR, safeFileName);
+
+    const buffer = Buffer.from(base64Data, 'base64');
+    fs.writeFileSync(filePath, buffer);
+
+    const publicUrl = `/uploads/notepad/${safeFileName}`;
+    console.log(`[노트패드] 이미지 업로드 완료: ${publicUrl} (${(buffer.length / 1024).toFixed(1)} KB)`);
+
+    res.json({
+      success: true,
+      url: publicUrl,
+      fileName: safeFileName
+    });
+  } catch (error) {
+    console.error('노트패드 이미지 업로드 실패:', error);
+    res.status(500).json({ success: false, message: '이미지 업로드 처리 중 오류가 발생했습니다.' });
+  }
+});
+
 function resetSourceMode() {
   if (presentationState.sourceMode === 'markdown') return;
   presentationState.sourceMode = 'markdown';
@@ -255,6 +324,7 @@ io.on('connection', (socket) => {
     sourceMode: presentationState.sourceMode,
     strokes: presentationState.docStrokes[presentationState.currentDoc] || [],
     annotations: presentationState.docAnnotations[presentationState.currentDoc] || [],
+    notepad: presentationState.notepad,
     hasPresenter: !!presentationState.presenterId,
     clientCount: presentationState.connectedClients.size,
     isYouPresenter: presentationState.presenterId === socket.id
@@ -304,14 +374,14 @@ io.on('connection', (socket) => {
   // 실시간 화면 동기화 (강사 -> 수강생)
   // ----------------------------------------
 
-  // 0) 마크다운 문서 / 전체 데스크톱 source 전환
+  // 0) 마크다운 문서 / 라이브 노트패드 / 전체 데스크톱 source 전환
   socket.on('set-source-mode', ({ sourceMode }, callback) => {
     if (socket.id !== presentationState.presenterId) {
       if (typeof callback === 'function') callback({ success: false, message: '강사 권한이 필요합니다.' });
       return;
     }
 
-    if (!['markdown', 'desktop'].includes(sourceMode)) {
+    if (!['markdown', 'desktop', 'notepad'].includes(sourceMode)) {
       if (typeof callback === 'function') callback({ success: false, message: '지원하지 않는 화면 모드입니다.' });
       return;
     }
@@ -319,6 +389,37 @@ io.on('connection', (socket) => {
     presentationState.sourceMode = sourceMode;
     io.emit('source-mode-changed', { sourceMode });
     if (typeof callback === 'function') callback({ success: true, sourceMode });
+  });
+
+  // 0-1) 실시간 노션형 라이브 노트패드 동기화 이벤트
+  socket.on('update-notepad', (data) => {
+    if (socket.id !== presentationState.presenterId) return;
+
+    if (data.title !== undefined) presentationState.notepad.title = data.title;
+    if (data.content !== undefined) presentationState.notepad.content = data.content;
+    presentationState.notepad.updatedAt = Date.now();
+
+    // 강사를 제외한 모든 수강생에게 실시간 브로드캐스트
+    socket.broadcast.emit('notepad-updated', presentationState.notepad);
+  });
+
+  // 0-2) 노트패드 내부 스크롤 비율 동기화
+  socket.on('sync-notepad-scroll', ({ scrollRatio }) => {
+    if (socket.id !== presentationState.presenterId) return;
+    presentationState.notepad.scrollRatio = scrollRatio;
+    socket.broadcast.emit('notepad-scroll-synced', { scrollRatio });
+  });
+
+  // 0-3) 노트패드 초기화
+  socket.on('clear-notepad', () => {
+    if (socket.id !== presentationState.presenterId) return;
+
+    presentationState.notepad.title = '💡 라이브 강의 요약 노트';
+    presentationState.notepad.content = '<p></p>';
+    presentationState.notepad.updatedAt = Date.now();
+    presentationState.notepad.scrollRatio = 0;
+
+    io.emit('notepad-cleared', presentationState.notepad);
   });
 
   // 1) 문서 변경 이벤트

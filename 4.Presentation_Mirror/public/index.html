@@ -135,6 +135,63 @@
           </div>
         </div>
 
+        <!-- 실시간 노션형 라이브 노트패드 스테이지 -->
+        <section id="notepad-stage" class="notepad-stage hidden" aria-label="실시간 라이브 강의 노트">
+          <!-- 상단 노션 서식 툴바 -->
+          <div id="notepad-formatting-toolbar" class="notepad-toolbar">
+            <div class="notepad-tool-group">
+              <button class="np-btn" data-notepad-cmd="heading" data-notepad-val="<h2>" title="큰 제목 (H2)"><i class="fas fa-heading"></i></button>
+              <button class="np-btn" data-notepad-cmd="heading" data-notepad-val="<h3>" title="중간 제목 (H3)"><i class="fas fa-heading" style="font-size:0.75rem;"></i></button>
+              <button class="np-btn" data-notepad-cmd="paragraph" title="일반 본문"><i class="fas fa-paragraph"></i></button>
+            </div>
+            <div class="np-divider"></div>
+            <div class="notepad-tool-group">
+              <button class="np-btn" data-notepad-cmd="bold" title="굵게 (Ctrl+B)"><i class="fas fa-bold"></i></button>
+              <button class="np-btn" data-notepad-cmd="italic" title="기울임 (Ctrl+I)"><i class="fas fa-italic"></i></button>
+              <button class="np-btn" data-notepad-cmd="underline" title="밑줄 (Ctrl+U)"><i class="fas fa-underline"></i></button>
+              <button class="np-btn" data-notepad-cmd="strikeThrough" title="취소선"><i class="fas fa-strikethrough"></i></button>
+            </div>
+            <div class="np-divider"></div>
+            <div class="notepad-tool-group">
+              <button class="np-btn" data-notepad-cmd="insertUnorderedList" title="글머리 기호 목록"><i class="fas fa-list-ul"></i></button>
+              <button class="np-btn" data-notepad-cmd="insertOrderedList" title="번호 매기기 목록"><i class="fas fa-list-ol"></i></button>
+              <button class="np-btn" data-notepad-cmd="checklist" title="할 일 체크리스트"><i class="fas fa-check-square"></i></button>
+              <button class="np-btn" data-notepad-cmd="blockquote" title="인용구"><i class="fas fa-quote-left"></i></button>
+              <button class="np-btn" data-notepad-cmd="callout" title="콜아웃 강조 박스"><i class="fas fa-lightbulb"></i></button>
+              <button class="np-btn" data-notepad-cmd="codeblock" title="코드 블록"><i class="fas fa-code"></i></button>
+              <button class="np-btn" data-notepad-cmd="divider" title="구분선"><i class="fas fa-minus"></i></button>
+            </div>
+            <div class="np-divider"></div>
+            <div class="notepad-tool-group">
+              <button class="np-btn" id="btn-notepad-insert-img" data-notepad-cmd="insertImage" title="사진 삽입 (또는 캡처 이미지 붙여넣기)"><i class="fas fa-image"></i> <span>사진 첨부</span></button>
+              <input type="file" id="notepad-file-input" accept="image/*" class="hidden" />
+            </div>
+            <div class="np-spacer"></div>
+            <div class="notepad-tool-group">
+              <button class="np-btn" id="btn-notepad-copy" title="노트 내용을 마크다운으로 복사"><i class="fas fa-copy"></i> <span>복사</span></button>
+              <button class="np-btn" id="btn-notepad-export-md" title="마크다운(.md) 파일로 저장"><i class="fas fa-download"></i> <span>다운로드</span></button>
+              <button class="np-btn np-btn-danger presenter-only" id="btn-notepad-clear" title="노트 내용 비우기"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          </div>
+
+          <!-- 노션 스타일 본문 컨테이너 -->
+          <div class="notepad-content-wrapper">
+            <div class="notepad-page-card">
+              <div class="notepad-page-header">
+                <div class="notepad-page-icon">📝</div>
+                <h1 id="notepad-title-input" class="notepad-page-title" contenteditable="false" placeholder="제목을 입력하세요 (예: 💡 라이브 강의 요약 노트)">💡 라이브 강의 요약 노트</h1>
+                <div class="notepad-meta-bar">
+                  <span class="notepad-badge"><i class="fas fa-bolt text-accent"></i> 실시간 공유 중</span>
+                  <span class="notepad-tip-text hide-mobile">💡 팁: 화면 캡처 후 <b>Ctrl+V</b>로 붙여넣으면 사진이 즉시 공유됩니다.</span>
+                </div>
+              </div>
+              <div id="notepad-editor" class="notepad-page-editor" contenteditable="false" placeholder="여기에 강의 요약 글을 작성하거나 사진을 붙여넣으세요...">
+                <!-- 동적 렌더링 -->
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- 전체 데스크톱 WebRTC 시청 영역 -->
         <section id="desktop-share-stage" class="desktop-share-stage hidden" aria-label="강사 데스크톱 화면">
           <video id="desktop-share-video" autoplay muted playsinline></video>
@@ -156,10 +213,25 @@
     </main>
 
     <!-- ==========================================
-         3. 강사용 플로팅 판서 툴바 (Presenter Toolbar)
+         3. 강사용 플로팅 판서 및 모드 전환 툴바 (Presenter Toolbar)
          ========================================== -->
     <div id="presenter-toolbar" class="hidden">
-      <!-- 도구 그룹: 선택, 형광펜, 밑줄, 자유 판서, 지우개 -->
+      <!-- 화면 모드 선택기: 마크다운 교재 / 라이브 노트 / 화면 공유 -->
+      <div class="tool-group mode-selector-group">
+        <button id="tool-btn-mode-markdown" class="tool-btn tool-btn-mode active" title="마크다운 교육자료 뷰어">
+          <i class="fas fa-book-open"></i><span>교재</span>
+        </button>
+        <button id="tool-btn-mode-notepad" class="tool-btn tool-btn-mode" title="실시간 노션형 라이브 노트패드">
+          <i class="fas fa-edit"></i><span>라이브 노트</span>
+        </button>
+        <button id="tool-btn-screen-share" class="tool-btn tool-btn-wide" type="button" title="전체 데스크톱 화면 공유" aria-pressed="false">
+          <i class="fas fa-display"></i><span>화면 공유</span>
+        </button>
+      </div>
+
+      <div class="tool-divider markdown-only"></div>
+
+      <!-- 도구 그룹: 선택, 형광펜, 밑줄, 자유 판서, 지우개 (마크다운 모드 전용) -->
       <div class="tool-group markdown-only">
         <button class="tool-btn active" data-tool="cursor" title="기본 커서 (스크롤 및 텍스트 선택)"><i class="fas fa-mouse-pointer"></i></button>
         <button class="tool-btn" data-tool="highlight" title="CSS 텍스트 형광펜 (텍스트 드래그)"><i class="fas fa-highlighter"></i></button>
@@ -192,9 +264,6 @@
       <div class="tool-divider"></div>
 
       <div class="tool-group">
-        <button id="tool-btn-screen-share" class="tool-btn tool-btn-wide" type="button" title="전체 데스크톱 화면 공유" aria-pressed="false">
-          <i class="fas fa-display"></i><span>화면 공유</span>
-        </button>
         <button id="tool-btn-fullscreen" class="tool-btn" title="전체화면 프레젠테이션 (단축키 F)"><i class="fas fa-expand"></i></button>
       </div>
     </div>

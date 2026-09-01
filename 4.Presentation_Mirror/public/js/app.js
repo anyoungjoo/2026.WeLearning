@@ -12,13 +12,14 @@ import { WhiteboardEngine } from './whiteboard.js';
 import { SyncEngine } from './syncEngine.js';
 import { ScreenShareManager } from './screenShare.js';
 import { TextAnnotationEngine } from './textAnnotation.js';
+import { NotepadEngine } from './notepad.js';
 
 class PresentationApp {
   constructor() {
     this.currentDocPath = '';
     this.allDocPaths = []; // 다음/이전 문서 이동용 평탄화 배열
     this.currentZoom = 1.0;
-    this.sourceMode = 'markdown';
+    this.sourceMode = 'markdown'; // 'markdown' | 'notepad' | 'desktop'
     this.activeTool = 'cursor';
     this.activeColor = '#ef4444';
     this.remoteCursorFadeTimer = null;
@@ -52,7 +53,17 @@ class PresentationApp {
       presenterCursorIcon: document.getElementById('presenter-cursor-icon'),
       presenterCursorBadge: document.getElementById('presenter-cursor-badge'),
       presenterToolbar: document.getElementById('presenter-toolbar'),
+      btnModeMarkdown: document.getElementById('tool-btn-mode-markdown'),
+      btnModeNotepad: document.getElementById('tool-btn-mode-notepad'),
       btnScreenShare: document.getElementById('tool-btn-screen-share'),
+      notepadStage: document.getElementById('notepad-stage'),
+      notepadToolbar: document.getElementById('notepad-formatting-toolbar'),
+      notepadTitleInput: document.getElementById('notepad-title-input'),
+      notepadEditor: document.getElementById('notepad-editor'),
+      notepadFileInput: document.getElementById('notepad-file-input'),
+      btnNotepadCopy: document.getElementById('btn-notepad-copy'),
+      btnNotepadExportMd: document.getElementById('btn-notepad-export-md'),
+      btnNotepadClear: document.getElementById('btn-notepad-clear'),
       desktopShareStage: document.getElementById('desktop-share-stage'),
       desktopShareVideo: document.getElementById('desktop-share-video'),
       desktopShareState: document.getElementById('desktop-share-state'),
@@ -84,6 +95,7 @@ class PresentationApp {
     this.initSyncEngine();
     this.initWhiteboard();
     this.initTextAnnotation();
+    this.initNotepad();
     this.initLiveCursorTracking();
     this.initUIEvents();
     this.initTheme();
@@ -96,6 +108,38 @@ class PresentationApp {
 
     void this.loadRuntimeConfig().catch(error => console.warn('미디어 설정 사전 로드 실패:', error));
     this.loadDocTree();
+  }
+
+  initNotepad() {
+    this.notepad = new NotepadEngine({
+      container: this.dom.notepadStage?.querySelector('.notepad-content-wrapper'),
+      titleEl: this.dom.notepadTitleInput,
+      editorEl: this.dom.notepadEditor,
+      toolbarEl: this.dom.notepadToolbar,
+      fileInput: this.dom.notepadFileInput,
+      onContentChange: (title, content) => {
+        this.sync.broadcastNotepadUpdate(title, content);
+      },
+      onScrollChange: (ratio) => {
+        this.sync.broadcastNotepadScroll(ratio);
+      },
+      showToast: (msg) => this.showToast(msg)
+    });
+
+    if (this.dom.btnNotepadCopy) {
+      this.dom.btnNotepadCopy.addEventListener('click', () => this.notepad.copyMarkdownToClipboard());
+    }
+    if (this.dom.btnNotepadExportMd) {
+      this.dom.btnNotepadExportMd.addEventListener('click', () => this.notepad.exportMarkdownFile());
+    }
+    if (this.dom.btnNotepadClear) {
+      this.dom.btnNotepadClear.addEventListener('click', () => {
+        if (confirm('실시간 라이브 노트 내용을 모두 지우시겠습니까?')) {
+          this.notepad.clear();
+          this.sync.broadcastClearNotepad();
+        }
+      });
+    }
   }
 
   initScreenShare() {
@@ -187,12 +231,17 @@ class PresentationApp {
   }
 
   async applySourceMode(sourceMode) {
-    const nextMode = sourceMode === 'desktop' ? 'desktop' : 'markdown';
+    let nextMode = 'markdown';
+    if (sourceMode === 'desktop') nextMode = 'desktop';
+    else if (sourceMode === 'notepad') nextMode = 'notepad';
+
     this.sourceMode = nextMode;
     document.body.dataset.sourceMode = nextMode;
+    this.updateModeButtons(nextMode);
 
     if (nextMode === 'desktop') {
       this.dom.zoomWrapper.classList.add('hidden');
+      if (this.dom.notepadStage) this.dom.notepadStage.classList.add('hidden');
       this.dom.desktopShareStage.classList.remove('hidden');
       if (this.dom.currentSourceIcon) this.dom.currentSourceIcon.className = 'fas fa-display';
       if (this.dom.currentDocTitle) this.dom.currentDocTitle.textContent = '데스크톱 화면 공유';
@@ -205,12 +254,27 @@ class PresentationApp {
       } else {
         await this.connectDesktopViewer();
       }
-    } else {
+    } else if (nextMode === 'notepad') {
       this.viewerConnectionGeneration += 1;
       await this.screenShare.stopViewing();
       this.dom.desktopShareStage.className = 'desktop-share-stage hidden';
       this.dom.desktopLiveBadge.classList.add('hidden');
+      this.dom.zoomWrapper.classList.add('hidden');
+      if (this.dom.notepadStage) this.dom.notepadStage.classList.remove('hidden');
+
+      if (this.dom.currentSourceIcon) this.dom.currentSourceIcon.className = 'fas fa-edit';
+      if (this.dom.currentDocTitle) this.dom.currentDocTitle.textContent = '실시간 라이브 노트';
+
+      this.whiteboard.setTool('cursor');
+    } else {
+      // markdown
+      this.viewerConnectionGeneration += 1;
+      await this.screenShare.stopViewing();
+      this.dom.desktopShareStage.className = 'desktop-share-stage hidden';
+      this.dom.desktopLiveBadge.classList.add('hidden');
+      if (this.dom.notepadStage) this.dom.notepadStage.classList.add('hidden');
       this.dom.zoomWrapper.classList.remove('hidden');
+
       if (this.dom.currentSourceIcon) this.dom.currentSourceIcon.className = 'fas fa-file-alt';
       if (this.dom.currentDocTitle) this.dom.currentDocTitle.textContent = this.getDocName(this.currentDocPath);
       setTimeout(() => this.whiteboard.resize(), 50);
@@ -222,6 +286,12 @@ class PresentationApp {
     } else {
       this.updateSyncUIState(this.sync.followMode);
     }
+  }
+
+  updateModeButtons(mode) {
+    if (this.dom.btnModeMarkdown) this.dom.btnModeMarkdown.classList.toggle('active', mode === 'markdown');
+    if (this.dom.btnModeNotepad) this.dom.btnModeNotepad.classList.toggle('active', mode === 'notepad');
+    if (this.dom.btnScreenShare) this.dom.btnScreenShare.classList.toggle('active', mode === 'desktop');
   }
 
   async connectDesktopViewer() {
@@ -339,14 +409,17 @@ class PresentationApp {
         this.updateClientCount(data.clientCount);
         this.updatePresenterStatus(data.hasPresenter, data.isYouPresenter);
 
+        if (data.notepad) {
+          this.notepad.setDocument(data.notepad.title, data.notepad.content);
+        }
         if (data.currentDoc) {
           this.loadDocument(data.currentDoc, data.scrollRatio, data.strokes, data.annotations);
         }
         if (data.zoomLevel) {
           this.setZoom(data.zoomLevel, false);
         }
-        if (data.sourceMode === 'desktop' && !data.isYouPresenter) {
-          void this.applySourceMode('desktop');
+        if (data.sourceMode && data.sourceMode !== 'markdown') {
+          void this.applySourceMode(data.sourceMode);
         }
       },
       onPresenterChanged: (hasPresenter) => {
@@ -367,6 +440,16 @@ class PresentationApp {
       },
       onRemoteSourceModeChanged: (sourceMode) => {
         void this.applySourceMode(sourceMode);
+      },
+      onRemoteNotepadUpdated: (data) => {
+        this.notepad.setDocument(data.title, data.content);
+      },
+      onRemoteNotepadScrollSynced: (scrollRatio) => {
+        this.notepad.setScrollRatio(scrollRatio);
+      },
+      onRemoteNotepadCleared: (data) => {
+        this.notepad.clear();
+        this.showToast('📝 강사가 라이브 노트를 초기화했습니다.');
       },
       onRemoteStrokeAdded: (docPath, stroke) => {
         if (this.currentDocPath === docPath) {
@@ -781,6 +864,31 @@ class PresentationApp {
       btnFullscreen.addEventListener('click', () => this.toggleFullscreen());
     }
 
+    // 화면 소스 모드 전환: 교재 (Markdown)
+    if (this.dom.btnModeMarkdown) {
+      this.dom.btnModeMarkdown.addEventListener('click', async () => {
+        if (this.sourceMode === 'desktop' || this.screenShare.publisher) {
+          await this.stopDesktopShare({ announce: false });
+        }
+        await this.sync.broadcastSourceMode('markdown');
+        await this.applySourceMode('markdown');
+        this.showToast('📖 교육자료 교재 화면으로 전환했습니다.');
+      });
+    }
+
+    // 화면 소스 모드 전환: 라이브 노트 (Notepad)
+    if (this.dom.btnModeNotepad) {
+      this.dom.btnModeNotepad.addEventListener('click', async () => {
+        if (this.sourceMode === 'desktop' || this.screenShare.publisher) {
+          await this.stopDesktopShare({ announce: false });
+        }
+        await this.sync.broadcastSourceMode('notepad');
+        await this.applySourceMode('notepad');
+        this.showToast('📝 실시간 라이브 노트패드 화면으로 전환했습니다.');
+      });
+    }
+
+    // 화면 소스 모드 전환: 화면 공유 (Desktop)
     this.dom.btnScreenShare.addEventListener('click', () => {
       if (this.sourceMode === 'desktop' || this.screenShare.publisher) {
         void this.stopDesktopShare();
@@ -1053,6 +1161,15 @@ class PresentationApp {
       return;
     }
 
+    if (pState.sourceMode === 'notepad') {
+      if (pState.notepad) {
+        this.notepad.setDocument(pState.notepad.title, pState.notepad.content);
+        this.notepad.setScrollRatio(pState.notepad.scrollRatio);
+      }
+      this.showToast('⚡ 강사의 실시간 라이브 노트와 동기화되었습니다!');
+      return;
+    }
+
     if (pState.currentDoc) {
       if (pState.currentDoc !== this.currentDocPath) {
         // 다른 문서에 있었다면 해당 문서로 로드 및 스크롤 이동
@@ -1082,12 +1199,15 @@ class PresentationApp {
   updatePresenterStatus(hasPresenter, isYouPresenter) {
     this.whiteboard.setPresenterMode(isYouPresenter);
     this.textAnnotation.setPresenterMode(isYouPresenter);
+    this.notepad.setPresenterMode(isYouPresenter);
 
     if (isYouPresenter) {
       this.dom.statusPill.className = 'status-pill presenter';
-      this.dom.statusPill.innerHTML = this.sourceMode === 'desktop'
-        ? '<span class="pulse-dot"></span> 내 화면 공유 중'
-        : '<span class="pulse-dot"></span> 강사 발표 모드';
+      let statusText = '강사 발표 모드';
+      if (this.sourceMode === 'desktop') statusText = '내 화면 공유 중';
+      else if (this.sourceMode === 'notepad') statusText = '라이브 노트 작성 중';
+
+      this.dom.statusPill.innerHTML = `<span class="pulse-dot"></span> ${statusText}`;
       this.dom.presenterToolbar.classList.remove('hidden');
       this.dom.btnCatchUp.classList.add('hidden');
       this.dom.syncToggle.parentElement.style.display = 'none';
@@ -1107,9 +1227,11 @@ class PresentationApp {
     this.dom.syncToggle.checked = isFollow;
     if (isFollow) {
       this.dom.statusPill.className = 'status-pill follow-on';
-      this.dom.statusPill.innerHTML = this.sourceMode === 'desktop'
-        ? '<span class="pulse-dot"></span> 강사 화면 시청 중'
-        : '<span class="pulse-dot"></span> 강사 동기화 중';
+      let statusText = '강사 동기화 중';
+      if (this.sourceMode === 'desktop') statusText = '강사 화면 시청 중';
+      else if (this.sourceMode === 'notepad') statusText = '라이브 노트 동기화 중';
+
+      this.dom.statusPill.innerHTML = `<span class="pulse-dot"></span> ${statusText}`;
       this.dom.btnCatchUp.classList.add('hidden');
     } else {
       this.dom.statusPill.className = 'status-pill follow-off';

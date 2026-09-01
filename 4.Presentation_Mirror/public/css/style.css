@@ -743,6 +743,316 @@ body.eraser-mode [data-ann-id]:hover {
   overflow: hidden;
   background: #06080d;
   color: #f8fafc;
+  z-index: 10;
+}
+
+/* ----------------------------------------------------
+   3-1. Notion-Style Live Notepad Stage (실시간 노션형 라이브 노트패드)
+   ---------------------------------------------------- */
+.notepad-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-primary);
+  z-index: 10;
+}
+
+/* 상단 서식 툴바 */
+.notepad-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  z-index: 20;
+  backdrop-filter: blur(8px);
+}
+
+.notepad-tool-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.np-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-color);
+  margin: 0 4px;
+}
+
+.np-spacer {
+  flex: 1;
+}
+
+.np-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.np-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.np-btn-danger:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+/* 수강생(읽기 전용) 상태일 때 편집 툴바 처리 */
+.notepad-toolbar.readonly .notepad-tool-group:not(:last-child),
+.notepad-toolbar.readonly .np-divider,
+.notepad-toolbar.readonly .presenter-only {
+  display: none !important;
+}
+
+/* 본문 스크롤 영역 */
+.notepad-content-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 36px 20px 140px;
+  display: flex;
+  justify-content: center;
+  scroll-behavior: smooth;
+}
+
+.notepad-page-card {
+  width: 100%;
+  max-width: 880px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 44px 52px;
+  min-height: 650px;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.notepad-page-header {
+  margin-bottom: 24px;
+}
+
+.notepad-page-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  user-select: none;
+  line-height: 1;
+}
+
+.notepad-page-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  border: none;
+  outline: none;
+  margin-bottom: 12px;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  word-break: break-word;
+}
+
+.notepad-page-title:empty:before {
+  content: attr(placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.notepad-meta-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+}
+
+.notepad-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--accent-light);
+  color: var(--accent-primary);
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+.notepad-tip-text {
+  color: var(--text-muted);
+}
+
+/* 본문 에디터 */
+.notepad-page-editor {
+  flex: 1;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--text-primary);
+  outline: none;
+  min-height: 380px;
+  word-break: break-word;
+}
+
+.notepad-page-editor.drag-over {
+  border: 2px dashed var(--accent-primary);
+  border-radius: 8px;
+  background: var(--accent-light);
+}
+
+.notepad-page-editor:empty:before {
+  content: attr(placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.notepad-page-editor h2 {
+  font-size: 1.55rem;
+  font-weight: 750;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 6px;
+}
+
+.notepad-page-editor h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.notepad-page-editor p {
+  margin-bottom: 12px;
+}
+
+.notepad-page-editor blockquote {
+  border-left: 4px solid var(--accent-primary);
+  padding: 8px 16px;
+  margin: 14px 0;
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+}
+
+.notepad-page-editor ul, .notepad-page-editor ol {
+  margin: 10px 0 14px 24px;
+}
+
+.notepad-page-editor li {
+  margin-bottom: 4px;
+}
+
+.notepad-page-editor hr {
+  border: none;
+  height: 1px;
+  background: var(--border-color);
+  margin: 24px 0;
+}
+
+/* 노션 스타일 특수 블록 */
+.notepad-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--accent-light);
+  border: 1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 16px 0;
+  color: var(--text-primary);
+}
+
+.callout-icon {
+  font-size: 1.3rem;
+  line-height: 1.2;
+  user-select: none;
+}
+
+.callout-body {
+  flex: 1;
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.notepad-codeblock {
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.notepad-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.notepad-checklist-item input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: var(--accent-primary);
+}
+
+/* 이미지 카드 렌더링 */
+.notepad-image-card {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.notepad-image-card .image-wrapper {
+  max-width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.notepad-image-card img {
+  display: block;
+  max-width: 100%;
+  max-height: 540px;
+  object-fit: contain;
+  background: var(--bg-hover);
+}
+
+.notepad-image-card figcaption {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+  text-align: center;
+  outline: none;
 }
 
 .desktop-share-stage video {
@@ -820,18 +1130,18 @@ body.eraser-mode [data-ann-id]:hover {
   position: absolute;
   top: 18px;
   left: 18px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 7px 11px;
-  border: 1px solid rgba(252, 165, 165, 0.42);
-  border-radius: 999px;
-  background: rgba(127, 29, 29, 0.86);
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  backdrop-filter: blur(10px);
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  color: #f8fafc;
+  font-size: 0.82rem;
+  font-weight: 700;
+  z-index: 15;
+  backdrop-filter: blur(8px);
 }
 
 @keyframes screen-connect-pulse {
@@ -871,6 +1181,19 @@ body.eraser-mode [data-ann-id]:hover {
   gap: 4px;
 }
 
+.tool-btn-mode {
+  width: auto;
+  padding: 0 12px;
+  height: 36px;
+  border-radius: 18px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
 .tool-divider {
   width: 1px;
   height: 24px;
@@ -901,7 +1224,7 @@ body.eraser-mode [data-ann-id]:hover {
 
 .tool-btn-wide {
   width: auto;
-  min-width: 112px;
+  min-width: 100px;
   padding: 0 14px;
   border-radius: 20px;
   gap: 7px;
@@ -915,8 +1238,14 @@ body.eraser-mode [data-ann-id]:hover {
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.28);
 }
 
-body[data-source-mode="desktop"] #presenter-toolbar .markdown-only {
-  display: none;
+body[data-source-mode="desktop"] #presenter-toolbar .markdown-only,
+body[data-source-mode="notepad"] #presenter-toolbar .markdown-only {
+  display: none !important;
+}
+
+body[data-source-mode="desktop"] .floating-zoom-bar,
+body[data-source-mode="notepad"] .floating-zoom-bar {
+  display: none !important;
 }
 
 .tool-btn:hover {

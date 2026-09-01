@@ -7,6 +7,9 @@ node_modules/
 test-results/
 
 # 외부 콘텐츠 및 개인/내부 자료 (공개 저장소 제외)
-docs/
+/docs/
+!4.Presentation_Mirror/docs/
+4.Presentation_Mirror/public/uploads/
 1.교육자료/심화_AI엔지니어링/
 **/config.js
+

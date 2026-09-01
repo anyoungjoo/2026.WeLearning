@@ -24,12 +24,20 @@ export class SyncEngine {
       scrollRatio: 0,
       zoomLevel: 1.0,
       sourceMode: 'markdown',
-      strokes: []
+      strokes: [],
+      notepad: {
+        title: '💡 라이브 강의 요약 노트',
+        content: '',
+        updatedAt: Date.now(),
+        scrollRatio: 0
+      }
     };
 
     // 스크롤 루프 방지용 플래그
     this.isProgrammaticScroll = false;
     this.scrollThrottleTimer = null;
+    this.notepadScrollThrottleTimer = null;
+    this.notepadUpdateThrottleTimer = null;
 
     this.initSocket();
   }
@@ -50,6 +58,7 @@ export class SyncEngine {
       this.presenterState.sourceMode = data.sourceMode || 'markdown';
       this.presenterState.strokes = data.strokes || [];
       this.presenterState.annotations = data.annotations || [];
+      this.presenterState.notepad = data.notepad || this.presenterState.notepad;
       this.hasPresenter = data.hasPresenter;
       this.clientCount = data.clientCount;
       this.isPresenter = data.isYouPresenter;
@@ -189,6 +198,28 @@ export class SyncEngine {
         }
       }
     });
+
+    // 11) 실시간 노션형 라이브 노트패드 동기화 이벤트 수신
+    this.socket.on('notepad-updated', (data) => {
+      this.presenterState.notepad = data;
+      if (this.callbacks.onRemoteNotepadUpdated) {
+        this.callbacks.onRemoteNotepadUpdated(data);
+      }
+    });
+
+    this.socket.on('notepad-scroll-synced', ({ scrollRatio }) => {
+      this.presenterState.notepad.scrollRatio = scrollRatio;
+      if (this.followMode && !this.isPresenter && this.callbacks.onRemoteNotepadScrollSynced) {
+        this.callbacks.onRemoteNotepadScrollSynced(scrollRatio);
+      }
+    });
+
+    this.socket.on('notepad-cleared', (data) => {
+      this.presenterState.notepad = data;
+      if (this.callbacks.onRemoteNotepadCleared) {
+        this.callbacks.onRemoteNotepadCleared(data);
+      }
+    });
   }
 
   // ----------------------------------------------------
@@ -309,5 +340,47 @@ export class SyncEngine {
       this.socket.emit('cursor-move', cursorData);
       this.cursorThrottleTimer = null;
     }, 30);
+  }
+
+  // ----------------------------------------------------
+  // 실시간 노션형 라이브 노트패드 발신 메서드
+  // ----------------------------------------------------
+
+  /**
+   * 노트패드 제목 및 본문 변경사항 브로드캐스트 (50ms 디바운스/쓰로틀)
+   */
+  broadcastNotepadUpdate(title, content) {
+    if (!this.isPresenter) return;
+    if (title !== undefined) this.presenterState.notepad.title = title;
+    if (content !== undefined) this.presenterState.notepad.content = content;
+
+    clearTimeout(this.notepadUpdateThrottleTimer);
+    this.notepadUpdateThrottleTimer = setTimeout(() => {
+      this.socket.emit('update-notepad', {
+        title: this.presenterState.notepad.title,
+        content: this.presenterState.notepad.content
+      });
+    }, 50);
+  }
+
+  /**
+   * 노트패드 내부 스크롤 비율 브로드캐스트 (30ms 쓰로틀링)
+   */
+  broadcastNotepadScroll(scrollRatio) {
+    if (!this.isPresenter) return;
+    if (this.notepadScrollThrottleTimer) return;
+
+    this.notepadScrollThrottleTimer = setTimeout(() => {
+      this.socket.emit('sync-notepad-scroll', { scrollRatio });
+      this.notepadScrollThrottleTimer = null;
+    }, 30);
+  }
+
+  /**
+   * 노트패드 초기화 브로드캐스트
+   */
+  broadcastClearNotepad() {
+    if (!this.isPresenter) return;
+    this.socket.emit('clear-notepad');
   }
 }
