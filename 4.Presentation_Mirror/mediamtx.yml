@@ -1,0 +1,23 @@
+# MediaMTX Configuration for Presentation Mirror
+# WebRTC Screen Sharing Service
+
+# Disable unused protocols to prevent port conflicts
+rtsp: no
+rtmp: no
+hls: no
+srt: no
+moq: no
+
+
+# WebRTC configuration
+webrtc: yes
+webrtcAddress: :8889
+webrtcEncryption: no
+webrtcAllowOrigins:
+  - '*'
+
+# Media paths configuration
+paths:
+  presentation:
+    source: publisher
+  all:
