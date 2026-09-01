@@ -4,3 +4,13 @@ services:
     container_name: presentation-mirror-media
     network_mode: host
     restart: unless-stopped
+    environment:
+      MTX_RTSP: "no"
+      MTX_RTMP: "no"
+      MTX_HLS: "no"
+      MTX_SRT: "no"
+      MTX_MOQ: "no"
+      MTX_WEBRTC: "yes"
+      MTX_WEBRTCADDRESS: ":8889"
+      MTX_WEBRTCALLOWORIGINS: '["*"]'
+
