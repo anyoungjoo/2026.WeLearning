@@ -486,7 +486,7 @@ body[data-source-mode="desktop"] #viewer-container {
   min-height: 100%;
   display: flex;
   justify-content: center;
-  padding: 40px 24px 120px 24px;
+  padding: 32px 24px 40px 24px;
 }
 
 /* Document Inner Canvas & Content Host */
@@ -498,8 +498,8 @@ body[data-source-mode="desktop"] #viewer-container {
   border-radius: 12px;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
   border: 1px solid var(--border-color);
-  padding: 48px 56px;
-  min-height: 800px;
+  padding: 40px 48px 32px 48px;
+  min-height: 200px;
 }
 
 /* Markdown Content Styling */
@@ -510,6 +510,10 @@ body[data-source-mode="desktop"] #viewer-container {
   line-height: 1.75;
   color: var(--text-primary);
   overflow-wrap: break-word;
+}
+
+#markdown-content > *:last-child {
+  margin-bottom: 0 !important;
 }
 
 /* 1. 구분선(HR): 오직 구분선 위치만 시원하고 넉넉한 상하 여백 제공 */

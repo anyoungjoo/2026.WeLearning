@@ -70,14 +70,17 @@ export class WhiteboardEngine {
   resize() {
     if (!this.host || !this.canvas) return;
 
-    const width = this.host.scrollWidth;
-    const height = Math.max(this.host.scrollHeight, 800);
+    // 1단계: 캔버스가 부모(host)의 scrollHeight를 고정(Latch)시키지 않도록 스타일 100% 유지
+    this.canvas.style.width = '100%';
+    this.canvas.style.height = '100%';
+
+    // 2단계: 실제 마크다운 본문 영역의 정확한 픽셀 크기 측정
+    const width = this.host.clientWidth || this.host.offsetWidth || 800;
+    const height = this.host.clientHeight || this.host.offsetHeight || 400;
 
     const dpr = window.devicePixelRatio || 1;
-    this.canvas.width = width * dpr;
-    this.canvas.height = height * dpr;
-    this.canvas.style.width = `${width}px`;
-    this.canvas.style.height = `${height}px`;
+    this.canvas.width = Math.max(1, Math.floor(width * dpr));
+    this.canvas.height = Math.max(1, Math.floor(height * dpr));
 
     this.ctx.scale(dpr, dpr);
     this.redrawAll();
