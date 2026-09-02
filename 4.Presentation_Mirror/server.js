@@ -128,6 +128,26 @@ function scanDirectory(dirPath, baseDir) {
   return result;
 }
 
+/**
+ * 파일 트리에서 첫 번째 마크다운 문서를 찾습니다.
+ */
+function findFirstMarkdownFile(tree) {
+  for (const node of tree) {
+    if (node.type === 'file' && node.isMarkdown) {
+      return node.path;
+    }
+    if (node.type === 'directory' && node.children) {
+      const found = findFirstMarkdownFile(node.children);
+      if (found) return found;
+    }
+  }
+  return '';
+}
+
+// 초기 마크다운 문서 자동 탐색 및 기본값 설정
+const initialTree = scanDirectory(MATERIALS_DIR, MATERIALS_DIR);
+presentationState.currentDoc = findFirstMarkdownFile(initialTree);
+
 // ----------------------------------------------------
 // 4. REST API 라우트 정의
 // ----------------------------------------------------

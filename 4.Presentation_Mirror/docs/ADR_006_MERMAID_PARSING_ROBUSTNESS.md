@@ -28,18 +28,21 @@
 
 ## 🏗 3. 기술적 결정 사항 및 2중 방어선 아키텍처 (Decision & Trade-offs)
 
-### 1) 2중 방어선 (Defensive Architecture) 채택
+### 1) 3중 방어선 (Defensive & Self-Healing Architecture) 채택
 - **1차 방어선 (Source Clean-up):**
-  - 전체 교육자료 28개 마크다운 파일 내의 모든 Mermaid 엣지 라벨을 표준 문법(`|"라벨"|`)으로 일괄 교정하고, 훼손된 테이블 서식 및 `jsonc` 태그를 정제.
+  - 전체 교육자료 마크다운 파일 내의 모든 Mermaid 엣지 라벨을 표준 문법(`|"라벨"|`)으로 일괄 교정하고, 테이블 서식 및 `jsonc` 태그 정제.
 - **2차 방어선 (Runtime Auto-Quoting Pipeline in `markdownRenderer.js`):**
-  - 향후 강사나 사용자가 작성한 새 마크다운 파일에 따옴표가 누락되더라도, Mermaid 파서로 넘어가기 전 `normalizeEdgeLabels` 정규화 함수가 `|텍스트|` 패턴을 감지하여 안전하게 `|"텍스트"|`로 자동 래핑.
+  - 파서로 넘어가기 전 `normalizeEdgeLabels` 정규화 함수가 `|텍스트|` 패턴을 감지하여 안전하게 `|"텍스트"|`로 자동 래핑.
+- **3차 방어선 (DOM Leak Cleanup & Parser State Isolation - 자가 복구):**
+  - 만에 하나 잘못된 Mermaid 문법이 들어와 렌더링에 실패하더라도, Mermaid가 `document.body`에 남기는 임시 에러 SVG 엘리먼트(`dmermaid-*-svg`)를 즉시 DOM에서 영구 제거(Garbage Collection)하고 전역 파서 상태(`initMermaid()`)를 즉각 리셋하여, **"에러가 있는 문서를 본 뒤 멀쩡한 다른 문서까지 렌더링이 먹통이 되는 연쇄 상태 오염(State Pollution)"**을 100% 원천 차단.
 
 ```mermaid
 graph LR
-    MD["📄 마크다운 원문<br/>(따옴표 누락된 엣지 라벨 포함)"] --> Normalizer["🛡️ normalizeMermaidSource<br/>(1. radar 변환 + 2. 엣지 라벨 자동 따옴표 감싸기)"]
-    Normalizer --> CleanMermaid["✨ 표준 Mermaid 소스<br/>(App -->|\"매번 API 호출 (유료/보안리스크)\"| CloudAI)"]
-    CleanMermaid --> MermaidEngine["⚙️ Mermaid.render (11.16.1)"]
-    MermaidEngine --> SVG["🖼️ 완벽한 SVG 다이어그램 렌더링"]
+    MD["📄 마크다운 원문<br/>(에러/특수문자 포함)"] --> Normalizer["🛡️ 1/2차: normalizeMermaidSource<br/>(radar 변환 + 라벨 따옴표 보정)"]
+    Normalizer --> RenderTry["⚙️ Mermaid.render (11.16.1)"]
+    RenderTry -->|성공| SVG["🖼️ 완벽한 SVG 다이어그램"]
+    RenderTry -->|예외 발생 시| SelfHeal["🧹 3차: DOM 잔여물 청소 + 파서 리셋<br/>(다음 문서 연쇄 오류 원천 차단)"]
+    SelfHeal --> FallbackUI["📝 원본 코드 블록 안전 표시"]
 ```
 
 ### 2) Highlight.js `jsonc` Alias 등록

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="100%" height="auto" style="max-width: 800px; font-family: Pretendard, sans-serif;">
+  <defs>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="blueCard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#6d28d9" />
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#60a5fa" />
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#34d399" />
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#fbbf24" />
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" rx="14" fill="#0b1329" stroke="#1e293b" stroke-width="1.5" />
+  <text x="24" y="32" fill="#94a3b8" font-size="13" font-weight="600">다이어그램 7.1: AI의 이해 전체 7단계 종합 아키텍처 요약 로드맵</text>
+  
+  <g transform="translate(30, 45)">
+    <rect x="0" y="0" width="740" height="34" rx="6" fill="#1e293b" stroke="#334155"/>
+    <text x="370" y="22" fill="#93c5fd" font-size="12" font-weight="600" text-anchor="middle">1. 회사 / 모델 / 서비스 분리 (모델에 화면과 도구를 붙인 완성품이 서비스)</text>
+    
+    <path d="M 370 34 L 370 46" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <rect x="0" y="48" width="740" height="34" rx="6" fill="#1e293b" stroke="#334155"/>
+    <text x="370" y="70" fill="#f8fafc" font-size="12" font-weight="600" text-anchor="middle">2. LLM = 확률 계산기 (모든 작업은 다음 토큰 텍스트 생성의 일환)</text>
+
+    <path d="M 370 82 L 370 94" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <rect x="0" y="96" width="740" height="34" rx="6" fill="#1e293b" stroke="#334155"/>
+    <text x="370" y="118" fill="#f8fafc" font-size="12" font-weight="600" text-anchor="middle">3. 추론 vs 학습 (우리가 하는 상호작용은 100% 고정 가중치 추론)</text>
+
+    <path d="M 370 130 L 370 142" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <rect x="0" y="144" width="740" height="34" rx="6" fill="#1e293b" stroke="#334155"/>
+    <text x="370" y="166" fill="#f8fafc" font-size="12" font-weight="600" text-anchor="middle">4. 모델 다양성 (언어=Transformer, 비전=CNN, 이미지=Diffusion, 표=XGBoost)</text>
+
+    <path d="M 370 178 L 370 190" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <rect x="0" y="192" width="740" height="34" rx="6" fill="#1e293b" stroke="#334155"/>
+    <text x="370" y="214" fill="#f8fafc" font-size="12" font-weight="600" text-anchor="middle">5. GPU 비용 & API 창구 (사람은 구독제, 프로그램은 종량제 API)</text>
+
+    <path d="M 370 226 L 370 238" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <rect x="0" y="240" width="740" height="34" rx="6" fill="url(#blueGrad)" stroke="#60a5fa"/>
+    <text x="370" y="262" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">6. AI 활용 2대 경로 (AI 탑재 시스템 vs 바이브 코딩 독립 프로그램)</text>
+  </g>
+
+</svg>

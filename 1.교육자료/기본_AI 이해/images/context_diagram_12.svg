@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" width="100%" height="auto" style="max-width: 800px; font-family: Pretendard, sans-serif;">
+  <defs>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="blueCard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#6d28d9" />
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#60a5fa" />
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#34d399" />
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" rx="14" fill="#0b1329" stroke="#1e293b" stroke-width="1.5" />
+  <text x="24" y="32" fill="#94a3b8" font-size="13" font-weight="600">다이어그램 10.1: Context 관리 핵심 6원칙 요약 로드맵</text>
+  
+  <g transform="translate(30, 45)">
+    <rect x="0" y="0" width="740" height="32" rx="6" fill="#1e293b" stroke="#334155"/>
+    <text x="370" y="21" fill="#93c5fd" font-size="11" font-weight="600" text-anchor="middle">1. 모델 기억 상실 (매 요청은 독립적 단발 계산)</text>
+    
+    <path d="M 370 32 L 370 42" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <rect x="0" y="44" width="740" height="32" rx="6" fill="#1e293b" stroke="#334155"/>
+    <text x="370" y="65" fill="#f8fafc" font-size="11" font-weight="600" text-anchor="middle">2. Context = 입력 텍스트 전체 (시스템 + 규칙 + 대화이력 + 첨부문서 + 질문)</text>
+
+    <path d="M 370 76 L 370 86" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <rect x="0" y="88" width="740" height="32" rx="6" fill="#1e293b" stroke="#334155"/>
+    <text x="370" y="109" fill="#f8fafc" font-size="11" font-weight="600" text-anchor="middle">3. Context Window 책상 넓이 (128k ≒ A4 60~80p / 1M ≒ 단행본 3~5권)</text>
+
+    <path d="M 370 120 L 370 130" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <rect x="0" y="132" width="740" height="32" rx="6" fill="#1e293b" stroke="#334155"/>
+    <text x="370" y="153" fill="#f8fafc" font-size="11" font-weight="600" text-anchor="middle">4. 창 과밀 리스크 (비용 급증, 응답 지연, Lost in the Middle, 맥락 부패)</text>
+
+    <path d="M 370 164 L 370 174" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <rect x="0" y="176" width="740" height="32" rx="6" fill="#1e293b" stroke="#334155"/>
+    <text x="370" y="197" fill="#f8fafc" font-size="11" font-weight="600" text-anchor="middle">5. RAG 지식 주입 (의미 검색으로 필요한 조각만 추출 주입: 5,000배 절감)</text>
+
+    <path d="M 370 208 L 370 218" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <rect x="0" y="220" width="740" height="32" rx="6" fill="url(#blueGrad)" stroke="#60a5fa"/>
+    <text x="370" y="241" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">6. 작업 단위별 세션 리셋 (HANDOVER.md로 인수인계 후 창 청소)</text>
+  </g>
+
+</svg>

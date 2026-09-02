@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 260" width="100%" height="auto" style="max-width: 800px; font-family: Pretendard, sans-serif;">
+  <defs>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="blueCard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#6d28d9" />
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#60a5fa" />
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#34d399" />
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" rx="14" fill="#0b1329" stroke="#1e293b" stroke-width="1.5" />
+  <text x="24" y="32" fill="#94a3b8" font-size="13" font-weight="600">다이어그램 1.2: Context 7가지 구성 요소 묶음</text>
+  
+  <g transform="translate(30, 45)">
+    <rect x="0" y="0" width="480" height="190" rx="10" fill="url(#blueCard)" stroke="#3b82f6"/>
+    <text x="20" y="25" fill="#93c5fd" font-size="12" font-weight="700">📦 이번 요청에 실제로 전송되는 Context 한 덩어리</text>
+    
+    <text x="20" y="50" fill="#cbd5e1" font-size="11">① 시스템 프롬프트 (서비스 기본 지침)</text>
+    <text x="20" y="70" fill="#cbd5e1" font-size="11">② 도구(Tool) 정의 (파일읽기, 터미널 등)</text>
+    <text x="20" y="90" fill="#cbd5e1" font-size="11">③ 프로젝트 규칙 문서 (AGENTS.md, CONTEXT.md)</text>
+    <text x="20" y="110" fill="#cbd5e1" font-size="11">④ 지금까지의 대화 이력 (턴마다 누적 팽창)</text>
+    <text x="20" y="130" fill="#cbd5e1" font-size="11">⑤ 첨부 문서 (PDF, 엑셀, 코드 파일 전문)</text>
+    <text x="20" y="150" fill="#cbd5e1" font-size="11">⑥ 도구 실행 결과 (터미널 출력, 검색 결과)</text>
+    <text x="20" y="170" fill="#60a5fa" font-size="11" font-weight="700">⑦ 지금 내가 친 질문 ("이거 왜 안 돼?")</text>
+
+    <path d="M 480 95 L 560 95" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="520" y="85" fill="#93c5fd" font-size="11" text-anchor="middle">통째로 전송</text>
+
+    <rect x="570" y="55" width="160" height="80" rx="10" fill="url(#blueGrad)" stroke="#60a5fa"/>
+    <text x="650" y="92" fill="#ffffff" font-size="14" font-weight="700" text-anchor="middle">🧠 LLM 엔진</text>
+    <text x="650" y="112" fill="#bfdbfe" font-size="11" text-anchor="middle">(1회성 추론 계산)</text>
+  </g>
+
+</svg>

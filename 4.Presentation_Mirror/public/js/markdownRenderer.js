@@ -169,6 +169,24 @@ export class MarkdownRenderer {
     this.mermaidRenderSequence = 0;
     this.initMarked();
     this.initHighlightJs();
+    this.initMermaid();
+  }
+
+  initMermaid() {
+    if (typeof mermaid !== 'undefined') {
+      try {
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: 'loose',
+          theme: 'dark',
+          flowchart: { htmlLabels: true, curve: 'linear' },
+          sequence: { showSequenceNumbers: true },
+          suppressErrorRendering: true
+        });
+      } catch (err) {
+        console.warn('Mermaid initialization warning:', err);
+      }
+    }
   }
 
   initHighlightJs() {
@@ -341,18 +359,23 @@ export class MarkdownRenderer {
       });
     }
 
-    // 2) Mermaid.js 다이어그램 렌더링 (순차 처리로 Mermaid 큐 충돌 방지)
+    // 2) Mermaid.js 다이어그램 렌더링 (사전 검증 + 타임아웃 보호 + 전역 상태 오염 원천 차단)
     if (typeof mermaid !== 'undefined') {
       const mermaidBlocks = Array.from(
         containerElement.querySelectorAll('pre code.language-mermaid')
       );
       for (const codeEl of mermaidBlocks) {
+        if (!containerElement.isConnected) break; // 새 문서 로드로 이전 컨테이너가 분리되었으면 즉시 중단
+
         const originalMermaid = codeEl.innerText;
         const legendContext = codeEl.parentElement?.nextElementSibling?.textContent || '';
         const mermaidSource = normalizeMermaidSource(originalMermaid, legendContext);
+        
+        // 고유 타임스탬프 + 시퀀스 번호로 ID 충돌 원천 차단
+        const uniqueRenderId = `mermaid-${Date.now()}-${++this.mermaidRenderSequence}`;
         const containerDiv = document.createElement('div');
         containerDiv.className = 'mermaid-chart';
-        containerDiv.id = `mermaid-chart-${++this.mermaidRenderSequence}`;
+        containerDiv.id = uniqueRenderId;
 
         const pre = codeEl.parentElement;
         const blockId = pre?.getAttribute('data-block-id');
@@ -361,14 +384,40 @@ export class MarkdownRenderer {
           pre.parentNode.replaceChild(containerDiv, pre);
         }
 
+        let rendered = false;
         try {
-          const { svg } = await mermaid.render(`${containerDiv.id}-render`, mermaidSource);
-          if (!containerDiv.isConnected) continue;
+          // [1차 방어선] 사전 구문 검증: 실패 시 render를 아예 호출하지 않아 Mermaid 싱글톤 런타임 보호
+          if (typeof mermaid.parse === 'function') {
+            await mermaid.parse(mermaidSource, { suppressErrors: true });
+          }
 
-          containerDiv.innerHTML = svg;
-          fitMermaidSvg(containerDiv.querySelector('svg'));
+          // [2차 방어선] 2초 타임아웃 레이스: 렌더링 지연으로 인한 UI 프리징 방지
+          const renderPromise = mermaid.render(`${uniqueRenderId}-svg`, mermaidSource);
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Mermaid render timeout (2000ms)')), 2000)
+          );
+
+          const { svg } = await Promise.race([renderPromise, timeoutPromise]);
+          if (containerDiv.isConnected) {
+            containerDiv.innerHTML = svg;
+            fitMermaidSvg(containerDiv.querySelector('svg'));
+            rendered = true;
+          }
         } catch (err) {
-          console.warn('Mermaid rendering error:', err);
+          console.warn(`[Presentation Mirror] Mermaid 렌더링 보호 조치 발동 (${uniqueRenderId}):`, err?.message || err);
+          
+          // [3차 방어선] document.body에 잔류하는 임시 노드 완전 청소 및 파서 리셋
+          try {
+            document.querySelectorAll(`[id*="${uniqueRenderId}"]`).forEach(el => {
+              if (el !== containerDiv && !containerDiv.contains(el)) el.remove();
+            });
+            this.initMermaid();
+          } catch (cleanErr) {
+            // safe cleanup pass
+          }
+        }
+
+        if (!rendered && containerDiv.isConnected) {
           containerDiv.classList.add('mermaid-error');
           const fallbackPre = document.createElement('pre');
           const fallbackCode = document.createElement('code');

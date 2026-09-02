@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 180" width="100%" height="auto" style="max-width: 800px; font-family: Pretendard, sans-serif;">
+  <defs>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="blueCard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#6d28d9" />
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#60a5fa" />
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#34d399" />
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" rx="14" fill="#0b1329" stroke="#1e293b" stroke-width="1.5" />
+  <text x="24" y="32" fill="#94a3b8" font-size="13" font-weight="600">다이어그램 1.1: 매 요청의 독립적 단발 계산 원리</text>
+  
+  <g transform="translate(30, 45)">
+    <rect x="0" y="0" width="220" height="90" rx="8" fill="url(#cardBg)" stroke="#334155"/>
+    <text x="15" y="24" fill="#94a3b8" font-size="11" font-weight="600">요청 1</text>
+    <rect x="15" y="32" width="80" height="40" rx="4" fill="#0f172a" stroke="#475569"/>
+    <text x="55" y="56" fill="#f8fafc" font-size="11" text-anchor="middle">질문 1</text>
+    <path d="M 95 52 L 125 52" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="130" y="32" width="75" height="40" rx="4" fill="#1e3a8a" stroke="#3b82f6"/>
+    <text x="167" y="56" fill="#93c5fd" font-size="11" text-anchor="middle">답변 1</text>
+
+    <rect x="250" y="0" width="220" height="90" rx="8" fill="url(#cardBg)" stroke="#334155"/>
+    <text x="265" y="24" fill="#94a3b8" font-size="11" font-weight="600">요청 2 (독립 계산)</text>
+    <rect x="265" y="32" width="80" height="40" rx="4" fill="#0f172a" stroke="#475569"/>
+    <text x="305" y="56" fill="#f8fafc" font-size="11" text-anchor="middle">질문 2</text>
+    <path d="M 345 52 L 375 52" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="380" y="32" width="75" height="40" rx="4" fill="#1e3a8a" stroke="#3b82f6"/>
+    <text x="417" y="56" fill="#93c5fd" font-size="11" text-anchor="middle">답변 2</text>
+
+    <rect x="500" y="0" width="220" height="90" rx="8" fill="url(#cardBg)" stroke="#334155"/>
+    <text x="515" y="24" fill="#94a3b8" font-size="11" font-weight="600">요청 3 (독립 계산)</text>
+    <rect x="515" y="32" width="80" height="40" rx="4" fill="#0f172a" stroke="#475569"/>
+    <text x="555" y="56" fill="#f8fafc" font-size="11" text-anchor="middle">질문 3</text>
+    <path d="M 595 52 L 625 52" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="630" y="32" width="75" height="40" rx="4" fill="#1e3a8a" stroke="#3b82f6"/>
+    <text x="667" y="56" fill="#93c5fd" font-size="11" text-anchor="middle">답변 3</text>
+  </g>
+
+</svg>

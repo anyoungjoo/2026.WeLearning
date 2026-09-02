@@ -933,6 +933,15 @@ class PresentationApp {
         this.allDocPaths = [];
         this.dom.sidebarTree.innerHTML = '';
         this.dom.sidebarTree.appendChild(this.buildTreeDOM(data.tree));
+
+        // 1단계: 최초 진입 시 아직 열린 문서가 없고 교육자료가 존재하면 첫 번째 문서 자동 로드
+        if (!this.currentDocPath && this.allDocPaths.length > 0) {
+          const firstDoc = this.allDocPaths[0];
+          if (this.sync.isPresenter) {
+            this.sync.broadcastDocChange(firstDoc);
+          }
+          this.loadDocument(firstDoc);
+        }
       }
     } catch (err) {
       console.error('교육자료 트리 로드 오류:', err);
