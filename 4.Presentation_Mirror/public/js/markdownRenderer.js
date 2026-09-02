@@ -213,6 +213,26 @@ export class MarkdownRenderer {
   }
 
   /**
+   * GitHub 스타일 Admonition / Callout 박스(> [!NOTE] 등) 사전 변환
+   */
+  processCallouts(markdown) {
+    const calloutMap = {
+      'NOTE': { class: 'note', icon: 'fa-info-circle', title: '참고 (Note)' },
+      'TIP': { class: 'tip', icon: 'fa-lightbulb', title: '팁 (Tip)' },
+      'IMPORTANT': { class: 'important', icon: 'fa-exclamation-circle', title: '중요 (Important)' },
+      'WARNING': { class: 'warning', icon: 'fa-triangle-exclamation', title: '주의 (Warning)' },
+      'CAUTION': { class: 'caution', icon: 'fa-fire', title: '경고 (Caution)' }
+    };
+
+    return markdown.replace(/^>[ ]?\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ ]*([^\n]*)\n((?:>[ ].*\n?)*)/gim, (match, type, title, body) => {
+      const config = calloutMap[type.toUpperCase()] || calloutMap.NOTE;
+      const displayTitle = title.trim() || config.title;
+      const cleanBody = body.replace(/^>[ ]?/gm, '');
+      return `<div class="admonition admonition-${config.class}"><div class="admonition-title"><i class="fas ${config.icon}"></i> ${displayTitle}</div><div class="admonition-content">\n\n${cleanBody}\n\n</div></div>\n\n`;
+    });
+  }
+
+  /**
    * 마크다운 텍스트를 파싱하고 HTML로 렌더링합니다.
    * @param {string} markdownText 마크다운 원문
    * @param {string} currentDocPath 현재 문서 상대경로 (이미지 상대경로 계산용)
@@ -222,19 +242,22 @@ export class MarkdownRenderer {
     if (!markdownText) return '<div class="empty-state">문서 내용이 비어있습니다.</div>';
 
     // 1단계: 마크다운 텍스트 내 이미지 상대 경로를 API 서빙 URL로 사전 치환
-    const processedMarkdown = this.resolveImagePaths(markdownText, currentDocPath);
+    let processed = this.resolveImagePaths(markdownText, currentDocPath);
 
-    // 2단계: Marked.js 파싱
+    // 2단계: GitHub Callouts (> [!NOTE] 등) 사전 처리
+    processed = this.processCallouts(processed);
+
+    // 3단계: Marked.js 파싱
     if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
       try {
-        return marked.parse(processedMarkdown);
+        return marked.parse(processed);
       } catch (err) {
         console.warn('Marked parsing error, falling back:', err);
       }
     }
 
-    // 3단계: Marked CDN 로드 지연 시 안전 Fallback 파서 (본문이 항상 보이도록 보장)
-    return this.fallbackRender(processedMarkdown);
+    // 4단계: Marked CDN 로드 지연 시 안전 Fallback 파서 (본문이 항상 보이도록 보장)
+    return this.fallbackRender(processed);
   }
 
   fallbackRender(md) {
@@ -316,10 +339,25 @@ export class MarkdownRenderer {
     if (!containerElement) return;
 
     // 0) 모든 마크다운 블록 요소에 고유 data-block-id 부여 (CSS 어노테이션 & 정밀 판서 매핑용)
-    const blockSelectors = 'h1, h2, h3, h4, h5, h6, p, li, blockquote, pre, tr, img';
+    const blockSelectors = 'h1, h2, h3, h4, h5, h6, p, li, blockquote, pre, tr, img, table';
     const blocks = containerElement.querySelectorAll(blockSelectors);
     blocks.forEach((el, idx) => {
       el.setAttribute('data-block-id', `blk-${idx}`);
+    });
+
+    // 0-1) 모든 마크다운 Table을 반응형 스크롤 컨테이너로 안전하게 래핑
+    containerElement.querySelectorAll('table:not(.wrapped)').forEach((table) => {
+      table.classList.add('wrapped');
+      const wrapper = document.createElement('div');
+      wrapper.className = 'table-responsive';
+      table.parentNode.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
+    });
+
+    // 0-2) 이미지 요소에 자동 반응형 센터링 및 고화질 렌더링 클래스 부여
+    containerElement.querySelectorAll('img:not(.rendered-diagram-img)').forEach((img) => {
+      img.classList.add('rendered-diagram-img');
+      img.loading = 'lazy';
     });
 
     // 1) Highlight.js 구문 강조 및 복사 버튼 부착

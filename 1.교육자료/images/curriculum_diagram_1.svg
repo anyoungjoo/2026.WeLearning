@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 180" width="100%" height="auto" style="max-width: 840px; font-family: Pretendard, sans-serif;">
+  <defs>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="blueCard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#60a5fa" />
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#34d399" />
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#f87171" />
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" rx="14" fill="#0b1329" stroke="#1e293b" stroke-width="1.5" />
+  <text x="24" y="32" fill="#94a3b8" font-size="13" font-weight="600">다이어그램: 방송국에서 막연하게 AI 도입 시 발생하는 전형적 시행착오</text>
+  
+  <g transform="translate(25, 45)">
+    <rect x="0" y="0" width="175" height="85" rx="8" fill="url(#cardBg)" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="87" y="30" fill="#60a5fa" font-size="12" font-weight="700" text-anchor="middle">💡 1. 막연한 발의</text>
+    <text x="87" y="52" fill="#f8fafc" font-size="11" text-anchor="middle">"AI로 영상도 만든다던데</text>
+    <text x="87" y="68" fill="#f8fafc" font-size="11" text-anchor="middle">우리도 뭐 해봅시다"</text>
+
+    <path d="M 175 42 L 200 42" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="205" y="0" width="175" height="85" rx="8" fill="url(#cardBg)" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="292" y="30" fill="#fbbf24" font-size="12" font-weight="700" text-anchor="middle">🎬 2. 영상 AI 검토</text>
+    <text x="292" y="52" fill="#f8fafc" font-size="11" text-anchor="middle">데모는 신기하고</text>
+    <text x="292" y="68" fill="#f8fafc" font-size="11" text-anchor="middle">비주얼은 화려함</text>
+
+    <path d="M 380 42 L 405 42" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="410" y="0" width="175" height="85" rx="8" fill="url(#cardBg)" stroke="#64748b" stroke-width="1.5"/>
+    <text x="497" y="30" fill="#cbd5e1" font-size="12" font-weight="700" text-anchor="middle">⚠️ 3. 실무 한계 봉착</text>
+    <text x="497" y="52" fill="#94a3b8" font-size="11" text-anchor="middle">환각·품질 통제 불가로</text>
+    <text x="497" y="68" fill="#94a3b8" font-size="11" text-anchor="middle">방송 송출 불가</text>
+
+    <path d="M 585 42 L 610 42" stroke="#f87171" stroke-width="2" marker-end="url(#arrowRed)"/>
+
+    <rect x="615" y="0" width="175" height="85" rx="8" fill="url(#cardBg)" stroke="#ef4444" stroke-width="1.5"/>
+    <text x="702" y="30" fill="#f87171" font-size="12" font-weight="700" text-anchor="middle">💸 4. 예산 낭비 결말</text>
+    <text x="702" y="52" fill="#fca5a5" font-size="11" text-anchor="middle">몇 달 뒤 예산만 쓰고</text>
+    <text x="702" y="68" fill="#fca5a5" font-size="11" text-anchor="middle">남은 도구가 없음</text>
+  </g>
+
+</svg>

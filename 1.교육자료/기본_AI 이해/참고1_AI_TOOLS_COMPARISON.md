@@ -8,11 +8,7 @@
 
 AI 도구는 개발에 얼마나 관여하느냐에 따라 **Chat UI**, **CLI Agent**, **Agentic IDE** 3가지 단계로 진화했다.
 
-```mermaid
-graph TD
-    G1["1세대: Chat UI<br/>(ChatGPT, Claude.ai)<br/>• 복사 & 붙여넣기 중심<br/>• 파일 직접 수정 불가"] --> G2["2세대: CLI Agent<br/>(Claude Code, Aider)<br/>• 터미널 명령 파일 자동 읽기/쓰기<br/>• 자동화 스크립트 실행"]
-    G2 --> G3["3세대: Agentic IDE<br/>(Antigravity, Cursor)<br/>• 에디터 심층 통합<br/>• 전역 Context 임베딩 색인<br/>• 원클릭 Inline Diff 승인"]
-```
+![AI 도구 비교 다이어그램](./images/ref_diagram_1.svg)
 
 ### 📊 AI 도구 종합 비교 명세표
 

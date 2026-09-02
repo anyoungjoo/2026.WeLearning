@@ -657,19 +657,127 @@ body[data-source-mode="desktop"] #viewer-container {
   font-size: 0.9rem;
 }
 
+/* 4. 마크다운 테이블 고도화 (반응형 래퍼 & 지브라 스트라이프) */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 20px 0;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
 #markdown-content table {
   width: 100%;
   border-collapse: collapse;
-  margin: 18px 0;
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.6;
 }
 
 #markdown-content th, #markdown-content td {
   border: 1px solid var(--border-color);
-  padding: 8px 12px;
+  padding: 10px 14px;
+  text-align: left;
 }
 
 #markdown-content th {
   background: var(--bg-sidebar);
+  font-weight: 700;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-color);
+}
+
+#markdown-content tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] #markdown-content tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* 5. GitHub 스타일 Admonition / Callout 박스 */
+.admonition {
+  margin: 22px 0;
+  padding: 16px 20px;
+  border-radius: 10px;
+  border-left: 5px solid;
+  background: var(--bg-sidebar);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.admonition-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 750;
+  font-size: 1.02rem;
+  margin-bottom: 10px;
+}
+
+.admonition-content p:last-child {
+  margin-bottom: 0;
+}
+
+.admonition.admonition-note {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+}
+.admonition.admonition-note .admonition-title { color: #2563eb; }
+[data-theme="dark"] .admonition.admonition-note .admonition-title { color: #60a5fa; }
+
+.admonition.admonition-tip {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+}
+.admonition.admonition-tip .admonition-title { color: #059669; }
+[data-theme="dark"] .admonition.admonition-tip .admonition-title { color: #34d399; }
+
+.admonition.admonition-important {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.08);
+}
+.admonition.admonition-important .admonition-title { color: #7c3aed; }
+[data-theme="dark"] .admonition.admonition-important .admonition-title { color: #a78bfa; }
+
+.admonition.admonition-warning {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+}
+.admonition.admonition-warning .admonition-title { color: #d97706; }
+[data-theme="dark"] .admonition.admonition-warning .admonition-title { color: #fbbf24; }
+
+.admonition.admonition-caution {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+.admonition.admonition-caution .admonition-title { color: #dc2626; }
+[data-theme="dark"] .admonition.admonition-caution .admonition-title { color: #f87171; }
+
+/* 6. 다이어그램 이미지 및 SVG 최적화 */
+.rendered-diagram-img {
+  display: block;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  margin: 24px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.08);
+}
+
+.mermaid-chart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 24px 0;
+  overflow: visible;
+}
+
+.mermaid-chart svg {
+  width: 100% !important;
+  max-width: 860px !important;
+  height: auto !important;
 }
 
 /* CSS Text Annotation Styles (Highlighter & Underline) */
