@@ -7,6 +7,75 @@
  */
 
 const ICE_GATHERING_TIMEOUT_MS = 8000;
+export const SCREEN_SHARE_FRAME_RATE = 15;
+export const SCREEN_SHARE_CODEC_PREFERENCE = Object.freeze([
+  'video/VP9',
+  'video/VP8',
+  'video/H264',
+  'video/AV1'
+]);
+
+export function buildDisplayMediaOptions() {
+  return {
+    video: {
+      cursor: 'always',
+      displaySurface: 'monitor',
+      // Do not constrain width or height. Preserve the selected display's
+      // native capture resolution and save bandwidth by limiting motion.
+      frameRate: {
+        ideal: SCREEN_SHARE_FRAME_RATE,
+        max: SCREEN_SHARE_FRAME_RATE
+      }
+    },
+    audio: false,
+    monitorTypeSurfaces: 'include',
+    selfBrowserSurface: 'exclude',
+    surfaceSwitching: 'include'
+  };
+}
+
+export function sortVideoCodecsByPreference(
+  codecs,
+  preferredOrder = SCREEN_SHARE_CODEC_PREFERENCE
+) {
+  const orderByMimeType = new Map(
+    preferredOrder.map((mimeType, index) => [mimeType.toLowerCase(), index])
+  );
+
+  return [...(codecs || [])]
+    .map((codec, originalIndex) => ({
+      codec,
+      originalIndex,
+      preference: orderByMimeType.get(String(codec.mimeType || '').toLowerCase())
+        ?? Number.MAX_SAFE_INTEGER
+    }))
+    .sort((a, b) => a.preference - b.preference || a.originalIndex - b.originalIndex)
+    .map(({ codec }) => codec);
+}
+
+export function applyVideoCodecPreference(transceiver, capabilities) {
+  if (typeof transceiver?.setCodecPreferences !== 'function') return false;
+
+  const codecs = capabilities?.codecs;
+  if (!Array.isArray(codecs) || codecs.length === 0) return false;
+
+  try {
+    // Reorder the browser-provided list instead of constructing one so that
+    // RTX, RED and FEC codecs remain available for packet recovery.
+    transceiver.setCodecPreferences(sortVideoCodecsByPreference(codecs));
+    return true;
+  } catch (error) {
+    console.warn('화면 공유 코덱 우선순위 적용 실패, 브라우저 기본값을 사용합니다.', error);
+    return false;
+  }
+}
+
+function getVideoCodecCapabilities(direction) {
+  if (direction === 'send') {
+    return globalThis.RTCRtpSender?.getCapabilities?.('video') || null;
+  }
+  return globalThis.RTCRtpReceiver?.getCapabilities?.('video') || null;
+}
 
 export function buildMediaEndpoint(baseUrl, mediaPath, protocol) {
   const normalizedBase = String(baseUrl || '').replace(/\/+$/, '');
@@ -123,18 +192,7 @@ export class ScreenShareManager {
     await this.stopPublishing();
     this.onStateChange({ role: 'presenter', state: 'requesting' });
 
-    const stream = await navigator.mediaDevices.getDisplayMedia({
-      video: {
-        cursor: 'always',
-        displaySurface: 'monitor',
-        width: { ideal: 1920 },
-        frameRate: { ideal: 15, max: 30 }
-      },
-      audio: false,
-      monitorTypeSurfaces: 'include',
-      selfBrowserSurface: 'exclude',
-      surfaceSwitching: 'include'
-    });
+    const stream = await navigator.mediaDevices.getDisplayMedia(buildDisplayMediaOptions());
 
     const videoTrack = stream.getVideoTracks()[0];
     if (!videoTrack) {
@@ -143,7 +201,9 @@ export class ScreenShareManager {
     }
 
     try {
-      videoTrack.contentHint = 'detail';
+      // Text content tells WebRTC to preserve resolution and reduce frame rate
+      // first when bandwidth is constrained.
+      videoTrack.contentHint = 'text';
     } catch {
       // contentHint is an optional browser optimization.
     }
@@ -155,6 +215,9 @@ export class ScreenShareManager {
 
     const peer = new RTCPeerConnection(this.config?.peerConnection || {});
     stream.getTracks().forEach(track => peer.addTrack(track, stream));
+    const videoTransceiver = peer.getTransceivers()
+      .find(transceiver => transceiver.sender.track === videoTrack);
+    applyVideoCodecPreference(videoTransceiver, getVideoCodecCapabilities('send'));
 
     peer.addEventListener('connectionstatechange', () => {
       const state = peer.connectionState;
@@ -196,7 +259,8 @@ export class ScreenShareManager {
 
     const peer = new RTCPeerConnection(this.config?.peerConnection || {});
     const remoteStream = new MediaStream();
-    peer.addTransceiver('video', { direction: 'recvonly' });
+    const videoTransceiver = peer.addTransceiver('video', { direction: 'recvonly' });
+    applyVideoCodecPreference(videoTransceiver, getVideoCodecCapabilities('receive'));
 
     peer.addEventListener('track', (event) => {
       const incomingTracks = event.streams[0]?.getTracks() || [event.track];
