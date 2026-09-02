@@ -422,7 +422,13 @@ class PresentationApp {
           this.notepad.setDocument(data.notepad.title, data.notepad.content);
         }
         if (data.currentDoc) {
-          this.loadDocument(data.currentDoc, data.scrollRatio, data.strokes, data.annotations);
+          // 이미 현재 문서를 열고 있는 상태(재연결 등)라면 스크롤을 0으로 강제 초기화하지 않고 현재 위치 보존
+          if (this.currentDocPath === data.currentDoc) {
+            if (data.strokes) this.whiteboard.setStrokes(data.strokes);
+            if (data.annotations) this.textAnnotation.renderAll(data.annotations);
+          } else {
+            this.loadDocument(data.currentDoc, data.scrollRatio, data.strokes, data.annotations);
+          }
         }
         if (data.zoomLevel) {
           this.setZoom(data.zoomLevel, false);
@@ -714,6 +720,7 @@ class PresentationApp {
 
     const markUserInteraction = () => {
       isUserDirectInteracting = true;
+      this.userHasScrolledManually = true;
       clearTimeout(userInteractTimer);
       userInteractTimer = setTimeout(() => {
         isUserDirectInteracting = false;
@@ -1105,18 +1112,28 @@ class PresentationApp {
           this.whiteboard.setStrokes(strokes);
         }
 
-        // 4) 1차 즉시 스크롤 적용
-        this.applyScrollRatio(targetScrollRatio);
+        this.userHasScrolledManually = false;
 
-        // 5) 이미지 로딩 완료 후 2차 정밀 스크롤 보정 및 캔버스 리사이즈
+        // 4) 1차 즉시 스크롤 적용
+        if (targetScrollRatio > 0) {
+          this.applyScrollRatio(targetScrollRatio);
+        } else {
+          this.dom.viewerContainer.scrollTop = 0;
+        }
+
+        // 5) 이미지 로딩 완료 후 2차 정밀 스크롤 보정 (사용자가 이미 수동 스크롤을 시작하지 않은 경우에만)
         await this.waitForImagesAndResize();
         if (loadGeneration !== this.documentLoadGeneration) return;
-        this.applyScrollRatio(targetScrollRatio);
+        if (!this.userHasScrolledManually && targetScrollRatio > 0) {
+          this.applyScrollRatio(targetScrollRatio);
+        }
 
-        // 레이아웃 안정화 후 3차 미세 보정 (300ms)
+        // 레이아웃 안정화 후 3차 미세 보정 (사용자가 수동 스크롤하지 않은 경우에만)
         setTimeout(() => {
           if (loadGeneration !== this.documentLoadGeneration) return;
-          this.applyScrollRatio(targetScrollRatio);
+          if (!this.userHasScrolledManually && targetScrollRatio > 0) {
+            this.applyScrollRatio(targetScrollRatio);
+          }
         }, 300);
       } else {
         throw new Error(data.message || '문서를 불러오지 못했습니다.');
