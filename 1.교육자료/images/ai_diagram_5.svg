@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 260" width="100%" height="auto" style="max-width: 800px; font-family: Pretendard, sans-serif;">
+  <defs>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="blueCard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#6d28d9" />
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#60a5fa" />
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#34d399" />
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#fbbf24" />
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" rx="14" fill="#0b1329" stroke="#1e293b" stroke-width="1.5" />
+  <text x="24" y="32" fill="#94a3b8" font-size="13" font-weight="600">다이어그램 3.5: ChatGPT 서비스(시스템) 내부 동작 구조</text>
+  
+  <g transform="translate(30, 45)">
+    <rect x="0" y="0" width="130" height="54" rx="8" fill="url(#cardBg)" stroke="#334155"/>
+    <text x="65" y="32" fill="#f8fafc" font-size="13" font-weight="600" text-anchor="middle">👤 사용자 입력</text>
+
+    <path d="M 130 27 L 175 27" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="180" y="0" width="160" height="54" rx="8" fill="url(#cardBg)" stroke="#f59e0b"/>
+    <text x="260" y="32" fill="#fbbf24" font-size="12" font-weight="600" text-anchor="middle">🛡️ 1. 입력 안전 검사</text>
+
+    <path d="M 340 27 L 385 27" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="390" y="0" width="170" height="54" rx="8" fill="url(#cardBg)" stroke="#3b82f6"/>
+    <text x="475" y="32" fill="#60a5fa" font-size="12" font-weight="600" text-anchor="middle">📦 2. Context 조립기</text>
+
+    <path d="M 560 27 L 605 27" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="610" y="0" width="130" height="54" rx="8" fill="url(#blueGrad)" stroke="#60a5fa"/>
+    <text x="675" y="32" fill="#ffffff" font-size="13" font-weight="700" text-anchor="middle">🧠 3. 핵심 LLM</text>
+
+    <!-- Down to Tool or Final -->
+    <path d="M 675 54 L 675 95" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="580" y="100" width="190" height="50" rx="8" fill="url(#cardBg)" stroke="#8b5cf6"/>
+    <text x="675" y="130" fill="#c084fc" font-size="12" font-weight="600" text-anchor="middle">🛠️ 외부 도구 (검색/코드실행)</text>
+
+    <path d="M 580 125 L 475 125 L 475 170" stroke="#8b5cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="520" y="118" fill="#c084fc" font-size="10" text-anchor="middle">결과 반영</text>
+
+    <rect x="380" y="175" width="190" height="50" rx="8" fill="url(#cardBg)" stroke="#10b981"/>
+    <text x="475" y="205" fill="#34d399" font-size="12" font-weight="600" text-anchor="middle">🛡️ 4. 출력 안전 필터</text>
+
+    <path d="M 380 200 L 250 200" stroke="#34d399" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+    <rect x="80" y="175" width="160" height="50" rx="8" fill="url(#greenGrad)" stroke="#34d399"/>
+    <text x="160" y="205" fill="#ffffff" font-size="13" font-weight="700" text-anchor="middle">💬 최종 답변 출력</text>
+  </g>
+
+</svg>
