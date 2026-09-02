@@ -1,36 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 180" width="100%" height="auto" style="max-width: 840px; font-family: Pretendard, sans-serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 170" width="100%" height="auto" style="max-width: 820px; font-family: Pretendard, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;">
   <defs>
-    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1e293b" />
-      <stop offset="100%" stop-color="#0f172a" />
-    </linearGradient>
-    <linearGradient id="blueCard" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1e3a8a" />
-      <stop offset="100%" stop-color="#1e293b" />
-    </linearGradient>
-    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#3b82f6" />
-      <stop offset="100%" stop-color="#1d4ed8" />
-    </linearGradient>
-    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#10b981" />
-      <stop offset="100%" stop-color="#047857" />
-    </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#60a5fa" />
+    <filter id="softShadow" x="-5%" y="-10%" width="110%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+    <filter id="cardHover" x="-5%" y="-10%" width="110%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#2563eb" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
     </marker>
     <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#34d399" />
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#059669" />
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#d97706" />
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#dc2626" />
+    </marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#7c3aed" />
     </marker>
   </defs>
-  <rect width="100%" height="100%" rx="14" fill="#0b1329" stroke="#1e293b" stroke-width="1.5" />
-  <text x="24" y="32" fill="#94a3b8" font-size="13" font-weight="600">다이어그램 1.1: AI 수어통역 도입 시 봉착하는 현실적 장벽</text>
+
+  <rect width="100%" height="100%" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
   
-  <g transform="translate(25, 45)">
-    <rect x="0" y="0" width="790" height="90" rx="8" fill="url(#cardBg)" stroke="#ef4444"/>
-    <text x="20" y="28" fill="#f87171" font-size="12" font-weight="700">🚫 AI 수어통역 자동화가 막히는 6개 층위의 구조적 벽</text>
-    <text x="20" y="52" fill="#cbd5e1" font-size="11">① 데이터 부족(한국수어 전산화 극소) + ② 음운체계 차이(비수지기호/표정/공간문법)</text>
-    <text x="20" y="72" fill="#cbd5e1" font-size="11">③ 실시간 환각 치명도(오역 시 방송사고) + ④ 검수 병목(사람 통역사 전량 검수 필수)</text>
+  <g transform="translate(24, 28)">
+    <circle cx="5" cy="0" r="4" fill="#2563eb" />
+    <text x="16" y="4" fill="#334155" font-size="13" font-weight="700">다이어그램 1.1: AI 수어통역 도입 시 봉착하는 현실적 장벽</text>
+  </g>
+
+  
+  <g transform="translate(25, 48)">
+    <rect x="0" y="0" width="770" height="85" rx="8" fill="#fff1f2" stroke="#fca5a5" stroke-width="1.5" filter="url(#softShadow)"/>
+    <text x="20" y="25" fill="#dc2626" font-size="12" font-weight="700">🚫 AI 수어통역 자동화가 막히는 6개 층위의 구조적 벽</text>
+    <text x="20" y="48" fill="#991b1b" font-size="11">① 데이터 부족(한국수어 전산화 극소) + ② 음운체계 차이(비수지기호/표정/공간문법)</text>
+    <text x="20" y="68" fill="#991b1b" font-size="11">③ 실시간 환각 치명도(오역 시 방송사고) + ④ 검수 병목(사람 통역사 전량 검수 필수)</text>
   </g>
 
 </svg>

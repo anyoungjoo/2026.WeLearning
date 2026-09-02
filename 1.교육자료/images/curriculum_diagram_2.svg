@@ -1,52 +1,57 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 200" width="100%" height="auto" style="max-width: 840px; font-family: Pretendard, sans-serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 180" width="100%" height="auto" style="max-width: 840px; font-family: Pretendard, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;">
   <defs>
-    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1e293b" />
-      <stop offset="100%" stop-color="#0f172a" />
-    </linearGradient>
-    <linearGradient id="blueCard" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1e3a8a" />
-      <stop offset="100%" stop-color="#1e293b" />
-    </linearGradient>
-    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#3b82f6" />
-      <stop offset="100%" stop-color="#1d4ed8" />
-    </linearGradient>
-    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#10b981" />
-      <stop offset="100%" stop-color="#047857" />
-    </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#60a5fa" />
+    <!-- Soft Gradients & Filters -->
+    <filter id="softShadow" x="-5%" y="-10%" width="110%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+    <filter id="cardHover" x="-5%" y="-10%" width="110%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#2563eb" flood-opacity="0.12"/>
+    </filter>
+    <!-- Markers -->
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
     </marker>
     <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#34d399" />
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#059669" />
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#d97706" />
     </marker>
     <marker id="arrowRed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#f87171" />
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#dc2626" />
+    </marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#7c3aed" />
     </marker>
   </defs>
-  <rect width="100%" height="100%" rx="14" fill="#0b1329" stroke="#1e293b" stroke-width="1.5" />
-  <text x="24" y="32" fill="#94a3b8" font-size="13" font-weight="600">다이어그램: 바이브 코딩의 2단계 구조 (개발 시 AI 사용 ➔ 실행 시 독립 구동)</text>
-  
-  <g transform="translate(25, 45)">
-    <rect x="0" y="0" width="790" height="60" rx="8" fill="url(#blueCard)" stroke="#3b82f6"/>
-    <text x="20" y="35" fill="#93c5fd" font-size="12" font-weight="700">🔨 1. 만들 때 (AI 활용):</text>
-    <text x="190" y="35" fill="#f8fafc" font-size="12">👤 나 (개발 지시)</text>
-    <path d="M 300 30 L 410 30" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
-    <text x="355" y="22" fill="#93c5fd" font-size="10" text-anchor="middle">"이런 도구 만들어줘"</text>
-    <text x="430" y="35" fill="#60a5fa" font-size="12" font-weight="700">🤖 AI Coding Agent</text>
-    <path d="M 580 30 L 650 30" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow)"/>
-    <text x="665" y="35" fill="#38bdf8" font-size="12">완성 코드 제공</text>
 
-    <rect x="0" y="75" width="790" height="60" rx="8" fill="url(#cardBg)" stroke="#10b981"/>
-    <text x="20" y="110" fill="#6ee7b7" font-size="12" font-weight="700">⚡ 2. 쓸 때 (독립 실행):</text>
-    <text x="190" y="110" fill="#f8fafc" font-size="12">💻 내 컴퓨터</text>
-    <path d="M 300 105 L 410 105" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
-    <text x="355" y="98" fill="#6ee7b7" font-size="10" text-anchor="middle">로컬 독립 실행</text>
-    <text x="430" y="110" fill="#34d399" font-size="12" font-weight="700">⚙️ 업무 자동화 도구</text>
-    <path d="M 580 105 L 650 105" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
-    <text x="665" y="110" fill="#4ade80" font-size="12" font-weight="700">✅ 0원 / 보안 100%</text>
+  <!-- Clean Canvas Background -->
+  <rect width="100%" height="100%" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+  
+  <g transform="translate(24, 28)">
+    <circle cx="5" cy="0" r="4" fill="#2563eb" />
+    <text x="16" y="4" fill="#334155" font-size="13" font-weight="700">다이어그램: 바이브 코딩의 2단계 구조 (개발 시 AI 사용 ➔ 실행 시 독립 구동)</text>
+  </g>
+
+  
+  <g transform="translate(20, 48)">
+    <rect x="0" y="0" width="800" height="52" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+    <text x="16" y="31" fill="#1d4ed8" font-size="12" font-weight="700">🔨 1. 만들 때 (AI 활용):</text>
+    <text x="180" y="31" fill="#0f172a" font-size="12">👤 나 (개발 지시)</text>
+    <path d="M 285 26 L 390 26" stroke="#2563eb" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+    <text x="337" y="18" fill="#2563eb" font-size="10" font-weight="600" text-anchor="middle">"도구 만들어줘"</text>
+    <text x="410" y="31" fill="#2563eb" font-size="12" font-weight="700">🤖 AI Coding Agent</text>
+    <path d="M 550 26 L 640 26" stroke="#2563eb" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+    <text x="660" y="31" fill="#1e40af" font-size="12">완성 소스코드 전달</text>
+
+    <rect x="0" y="64" width="800" height="52" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.5"/>
+    <text x="16" y="95" fill="#065f46" font-size="12" font-weight="700">⚡ 2. 쓸 때 (독립 실행):</text>
+    <text x="180" y="95" fill="#0f172a" font-size="12">💻 내 컴퓨터</text>
+    <path d="M 285 90 L 390 90" stroke="#059669" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+    <text x="337" y="82" fill="#059669" font-size="10" font-weight="600" text-anchor="middle">로컬 독립 실행</text>
+    <text x="410" y="95" fill="#059669" font-size="12" font-weight="700">⚙️ 업무 자동화 도구</text>
+    <path d="M 550 90 L 640 90" stroke="#059669" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+    <text x="660" y="95" fill="#047857" font-size="12" font-weight="700">✅ 0원 / 보안 100%</text>
   </g>
 
 </svg>
