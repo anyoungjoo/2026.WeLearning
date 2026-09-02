@@ -616,9 +616,7 @@ body[data-source-mode="desktop"] #viewer-container {
   max-width: 100%;
   margin: 20px 0;
   padding: 12px 4px;
-  overflow-x: auto;
-  overflow-y: visible;
-  overscroll-behavior-inline: contain;
+  overflow: visible;
   box-sizing: border-box;
 }
 

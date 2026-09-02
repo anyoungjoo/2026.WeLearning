@@ -9,13 +9,120 @@
  * 5. 목차(TOC)용 헤딩 앵커 자동 생성
  */
 
-export function fitMermaidSvg(svgElement) {
-  if (!svgElement) return;
+const MERMAID_VIEWBOX_PADDING = 12;
+
+function escapeMermaidLabel(value) {
+  return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+function extractLegacyRadarLegend(contextText, seriesCount) {
+  const legendBody = String(contextText || '').match(/범례\s*:\s*([^)]*)/i)?.[1] || '';
+  const names = legendBody
+    .split(/[,，]/)
+    .map(part => part.includes('=') ? part.slice(part.indexOf('=') + 1).trim() : '')
+    .filter(Boolean);
+
+  return Array.from(
+    { length: seriesCount },
+    (_, index) => names[index] || `계열 ${index + 1}`
+  );
+}
+
+/**
+ * 초기 교재에서 사용한 비표준 radar 문법을 Mermaid 11의 radar-beta 문법으로 변환합니다.
+ */
+export function normalizeMermaidSource(source, contextText = '') {
+  const originalSource = String(source || '');
+  const lines = originalSource.trim().split(/\r?\n/);
+  if (lines[0]?.trim().toLowerCase() !== 'radar') return originalSource;
+
+  let title = '';
+  const metrics = [];
+
+  for (const line of lines.slice(1)) {
+    const titleMatch = line.match(/^\s*title\s+(.+?)\s*$/i);
+    if (titleMatch) {
+      title = titleMatch[1];
+      continue;
+    }
+
+    const metricMatch = line.match(/^\s*"([^"]+)"\s*:\s*\[([^\]]+)\]\s*$/);
+    if (!metricMatch) continue;
+
+    const values = metricMatch[2].split(',').map(value => Number(value.trim()));
+    if (values.length === 0 || !values.every(Number.isFinite)) return originalSource;
+    metrics.push({ label: metricMatch[1], values });
+  }
+
+  const seriesCount = metrics[0]?.values.length || 0;
+  if (metrics.length < 3
+    || seriesCount === 0
+    || metrics.some(metric => metric.values.length !== seriesCount)) {
+    return originalSource;
+  }
+
+  const seriesNames = extractLegacyRadarLegend(contextText, seriesCount);
+  const allValues = metrics.flatMap(metric => metric.values);
+  const highestValue = Math.max(...allValues);
+  const scaleMax = highestValue <= 10 ? 10 : Math.ceil(highestValue);
+  const output = ['radar-beta'];
+
+  if (title) output.push(`  title ${title}`);
+  metrics.forEach((metric, index) => {
+    output.push(`  axis metric${index + 1}["${escapeMermaidLabel(metric.label)}"]`);
+  });
+  seriesNames.forEach((seriesName, seriesIndex) => {
+    const values = metrics.map(metric => metric.values[seriesIndex]).join(', ');
+    output.push(`  curve series${seriesIndex + 1}["${escapeMermaidLabel(seriesName)}"]{${values}}`);
+  });
+  output.push('  min 0', `  max ${scaleMax}`, '  showLegend true');
+
+  return output.join('\n');
+}
+
+export function expandMermaidViewBox(svgElement, padding = MERMAID_VIEWBOX_PADDING) {
+  if (!svgElement || typeof svgElement.getBBox !== 'function') return null;
 
   const viewBox = String(svgElement.getAttribute('viewBox') || '')
     .trim()
     .split(/[\s,]+/)
     .map(Number);
+  if (viewBox.length !== 4 || !viewBox.every(Number.isFinite) || viewBox[2] <= 0 || viewBox[3] <= 0) {
+    return null;
+  }
+
+  try {
+    const bounds = svgElement.getBBox();
+    if (![bounds.x, bounds.y, bounds.width, bounds.height].every(Number.isFinite)
+      || bounds.width <= 0
+      || bounds.height <= 0) {
+      return viewBox;
+    }
+
+    const [viewX, viewY, viewWidth, viewHeight] = viewBox;
+    const safePadding = Number.isFinite(padding) ? Math.max(0, padding) : MERMAID_VIEWBOX_PADDING;
+    const minX = Math.min(viewX, bounds.x - safePadding);
+    const minY = Math.min(viewY, bounds.y - safePadding);
+    const maxX = Math.max(viewX + viewWidth, bounds.x + bounds.width + safePadding);
+    const maxY = Math.max(viewY + viewHeight, bounds.y + bounds.height + safePadding);
+    const expandedViewBox = [minX, minY, maxX - minX, maxY - minY];
+
+    svgElement.setAttribute('viewBox', expandedViewBox.join(' '));
+    return expandedViewBox;
+  } catch (error) {
+    console.warn('Mermaid bounds measurement error:', error);
+    return viewBox;
+  }
+}
+
+export function fitMermaidSvg(svgElement) {
+  if (!svgElement) return;
+
+  const viewBox = expandMermaidViewBox(svgElement)
+    || String(svgElement.getAttribute('viewBox') || '')
+      .trim()
+      .split(/[\s,]+/)
+      .map(Number);
   const naturalWidth = viewBox.length === 4 && Number.isFinite(viewBox[2]) && viewBox[2] > 0
     ? Math.ceil(viewBox[2])
     : null;
@@ -163,7 +270,7 @@ export class MarkdownRenderer {
 
     // 1) Highlight.js 구문 강조 및 복사 버튼 부착
     if (typeof hljs !== 'undefined') {
-      containerElement.querySelectorAll('pre code').forEach((block) => {
+      containerElement.querySelectorAll('pre code:not(.language-mermaid)').forEach((block) => {
         // 이미 하이라이트된 블록인지 확인
         if (!block.classList.contains('hljs')) {
           hljs.highlightElement(block);
@@ -204,7 +311,9 @@ export class MarkdownRenderer {
         containerElement.querySelectorAll('pre code.language-mermaid')
       );
       await Promise.all(mermaidBlocks.map(async (codeEl) => {
-        const rawMermaid = codeEl.innerText;
+        const originalMermaid = codeEl.innerText;
+        const legendContext = codeEl.parentElement?.nextElementSibling?.textContent || '';
+        const mermaidSource = normalizeMermaidSource(originalMermaid, legendContext);
         const containerDiv = document.createElement('div');
         containerDiv.className = 'mermaid-chart';
         containerDiv.id = `mermaid-chart-${++this.mermaidRenderSequence}`;
@@ -215,7 +324,7 @@ export class MarkdownRenderer {
         pre.parentNode.replaceChild(containerDiv, pre);
 
         try {
-          const { svg } = await mermaid.render(`${containerDiv.id}-render`, rawMermaid);
+          const { svg } = await mermaid.render(`${containerDiv.id}-render`, mermaidSource);
           if (!containerDiv.isConnected) return;
 
           containerDiv.innerHTML = svg;
@@ -225,7 +334,7 @@ export class MarkdownRenderer {
           containerDiv.classList.add('mermaid-error');
           const fallbackPre = document.createElement('pre');
           const fallbackCode = document.createElement('code');
-          fallbackCode.textContent = rawMermaid;
+          fallbackCode.textContent = originalMermaid;
           fallbackPre.appendChild(fallbackCode);
           containerDiv.replaceChildren(fallbackPre);
         }
