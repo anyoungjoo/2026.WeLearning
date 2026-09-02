@@ -84,19 +84,35 @@ test('legacy radar material is converted to Mermaid radar-beta syntax', () => {
   assert.match(normalized, /max 10/);
 });
 
-test('Highlight.js processing skips Mermaid code blocks', () => {
+test('normalizeMermaidSource automatically quotes unquoted edge labels containing parentheses and special chars', () => {
+  const source = `graph LR
+    User["👤 사용자 입력"] --> App["💻 사내 프로그램"]
+    App -->|매번 API 호출 (유료/보안리스크)| CloudAI["🌐 클라우드 AI 모델"]
+    CloudAI -->|"이미 따옴표가 있는 라벨"| App
+    Step1 -->|1차: 기계 번역<br/>(한국어-KSL 병렬 코퍼스 극도 부족)| Step2`;
+
+  const normalized = normalizeMermaidSource(source);
+
+  assert.match(normalized, /App -->\|"매번 API 호출 \(유료\/보안리스크\)"\| CloudAI/);
+  assert.match(normalized, /CloudAI -->\|"이미 따옴표가 있는 라벨"\| App/);
+  assert.match(normalized, /Step1 -->\|"1차: 기계 번역<br\/>\(한국어-KSL 병렬 코퍼스 극도 부족\)"\| Step2/);
+});
+
+test('Highlight.js processing skips Mermaid code blocks and supports jsonc alias', () => {
   const rendererSource = fs.readFileSync(
     new URL('../public/js/markdownRenderer.js', import.meta.url),
     'utf8'
   );
 
   assert.match(rendererSource, /pre code:not\(\.language-mermaid\)/);
+  assert.match(rendererSource, /hljs\.registerAliases\('jsonc',\s*\{\s*languageName:\s*'json'\s*\}\)/);
 });
 
 test('the viewer loads a Mermaid version that supports radar-beta', () => {
   const indexHtml = fs.readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 
   assert.match(indexHtml, /mermaid@11\.16\.1\/dist\/mermaid\.min\.js/);
+  assert.match(indexHtml, /<link rel="icon"/);
 });
 
 test('materials table of contents shows the Markdown filename extension', () => {

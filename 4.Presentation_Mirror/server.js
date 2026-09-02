@@ -54,6 +54,11 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 파비콘 404 방지 핸들러
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end();
+});
+
 // ----------------------------------------------------
 // 2. 프레젠테이션 실시간 세션 상태 관리 (In-Memory State)
 // ----------------------------------------------------

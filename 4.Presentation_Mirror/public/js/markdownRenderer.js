@@ -29,55 +29,83 @@ function extractLegacyRadarLegend(contextText, seriesCount) {
 }
 
 /**
- * 초기 교재에서 사용한 비표준 radar 문법을 Mermaid 11의 radar-beta 문법으로 변환합니다.
+ * 다이어그램 엣지 라벨 중 따옴표가 누락된 텍스트를 안전하게 큰따옴표로 감싸 구문 파싱 오류를 방지합니다.
+ * 예: `-->|매번 API 호출 (유료/보안리스크)|` -> `-->|"매번 API 호출 (유료/보안리스크)"|`
+ */
+export function normalizeEdgeLabels(source) {
+  const lines = String(source || '').split(/\r?\n/);
+  const processed = lines.map((line) => {
+    // 엣지 라벨 |label| 매칭
+    return line.replace(/\|([^|\r\n]+)\|/g, (match, label) => {
+      const trimmed = label.trim();
+      // 이미 큰따옴표로 둘러싸여 있는 경우 건너뜀
+      if (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length >= 2) {
+        return match;
+      }
+      // 큰따옴표로 안전하게 감싸고 내부 이스케이프
+      const escaped = trimmed.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+      return `|"${escaped}"|`;
+    });
+  });
+  return processed.join('\n');
+}
+
+/**
+ * 1. 비표준 radar 문법을 Mermaid 11의 radar-beta 문법으로 변환합니다.
+ * 2. flowchart/graph 등의 엣지 라벨에 특수문자/괄호가 있을 때 파싱 오류를 방지하기 위해 큰따옴표로 자동 정규화합니다.
  */
 export function normalizeMermaidSource(source, contextText = '') {
   const originalSource = String(source || '');
   const lines = originalSource.trim().split(/\r?\n/);
-  if (lines[0]?.trim().toLowerCase() !== 'radar') return originalSource;
+  
+  // radar 문법 변환
+  if (lines[0]?.trim().toLowerCase() === 'radar') {
+    let title = '';
+    const metrics = [];
 
-  let title = '';
-  const metrics = [];
+    for (const line of lines.slice(1)) {
+      const titleMatch = line.match(/^\s*title\s+(.+?)\s*$/i);
+      if (titleMatch) {
+        title = titleMatch[1];
+        continue;
+      }
 
-  for (const line of lines.slice(1)) {
-    const titleMatch = line.match(/^\s*title\s+(.+?)\s*$/i);
-    if (titleMatch) {
-      title = titleMatch[1];
-      continue;
+      const metricMatch = line.match(/^\s*"([^"]+)"\s*:\s*\[([^\]]+)\]\s*$/);
+      if (!metricMatch) continue;
+
+      const values = metricMatch[2].split(',').map(value => Number(value.trim()));
+      if (values.length === 0 || !values.every(Number.isFinite)) return originalSource;
+      metrics.push({ label: metricMatch[1], values });
     }
 
-    const metricMatch = line.match(/^\s*"([^"]+)"\s*:\s*\[([^\]]+)\]\s*$/);
-    if (!metricMatch) continue;
+    const seriesCount = metrics[0]?.values.length || 0;
+    if (metrics.length < 3
+      || seriesCount === 0
+      || metrics.some(metric => metric.values.length !== seriesCount)) {
+      return originalSource;
+    }
 
-    const values = metricMatch[2].split(',').map(value => Number(value.trim()));
-    if (values.length === 0 || !values.every(Number.isFinite)) return originalSource;
-    metrics.push({ label: metricMatch[1], values });
+    const seriesNames = extractLegacyRadarLegend(contextText, seriesCount);
+    const allValues = metrics.flatMap(metric => metric.values);
+    const highestValue = Math.max(...allValues);
+    const scaleMax = highestValue <= 10 ? 10 : Math.ceil(highestValue);
+    const output = ['radar-beta'];
+
+    if (title) output.push(`  title ${title}`);
+    metrics.forEach((metric, index) => {
+      output.push(`  axis metric${index + 1}["${escapeMermaidLabel(metric.label)}"]`);
+    });
+    seriesNames.forEach((seriesName, seriesIndex) => {
+      const values = metrics.map(metric => metric.values[seriesIndex]).join(', ');
+      output.push(`  curve series${seriesIndex + 1}["${escapeMermaidLabel(seriesName)}"]{${values}}`);
+    });
+    output.push('  min 0', `  max ${scaleMax}`, '  showLegend true');
+
+    return output.join('\n');
   }
 
-  const seriesCount = metrics[0]?.values.length || 0;
-  if (metrics.length < 3
-    || seriesCount === 0
-    || metrics.some(metric => metric.values.length !== seriesCount)) {
-    return originalSource;
-  }
-
-  const seriesNames = extractLegacyRadarLegend(contextText, seriesCount);
-  const allValues = metrics.flatMap(metric => metric.values);
-  const highestValue = Math.max(...allValues);
-  const scaleMax = highestValue <= 10 ? 10 : Math.ceil(highestValue);
-  const output = ['radar-beta'];
-
-  if (title) output.push(`  title ${title}`);
-  metrics.forEach((metric, index) => {
-    output.push(`  axis metric${index + 1}["${escapeMermaidLabel(metric.label)}"]`);
-  });
-  seriesNames.forEach((seriesName, seriesIndex) => {
-    const values = metrics.map(metric => metric.values[seriesIndex]).join(', ');
-    output.push(`  curve series${seriesIndex + 1}["${escapeMermaidLabel(seriesName)}"]{${values}}`);
-  });
-  output.push('  min 0', `  max ${scaleMax}`, '  showLegend true');
-
-  return output.join('\n');
+  // 일반 다이어그램: 엣지 라벨 자동 따옴표 보정
+  return normalizeEdgeLabels(originalSource);
 }
 
 export function expandMermaidViewBox(svgElement, padding = MERMAID_VIEWBOX_PADDING) {
@@ -140,6 +168,14 @@ export class MarkdownRenderer {
   constructor() {
     this.mermaidRenderSequence = 0;
     this.initMarked();
+    this.initHighlightJs();
+  }
+
+  initHighlightJs() {
+    if (typeof hljs !== 'undefined' && typeof hljs.registerAliases === 'function') {
+      hljs.registerAliases('jsonc', { languageName: 'json' });
+      hljs.registerAliases(['powershell', 'ps1', 'pwsh', 'ps'], { languageName: 'powershell' });
+    }
   }
 
   initMarked() {
@@ -305,12 +341,12 @@ export class MarkdownRenderer {
       });
     }
 
-    // 2) Mermaid.js 다이어그램 렌더링
+    // 2) Mermaid.js 다이어그램 렌더링 (순차 처리로 Mermaid 큐 충돌 방지)
     if (typeof mermaid !== 'undefined') {
       const mermaidBlocks = Array.from(
         containerElement.querySelectorAll('pre code.language-mermaid')
       );
-      await Promise.all(mermaidBlocks.map(async (codeEl) => {
+      for (const codeEl of mermaidBlocks) {
         const originalMermaid = codeEl.innerText;
         const legendContext = codeEl.parentElement?.nextElementSibling?.textContent || '';
         const mermaidSource = normalizeMermaidSource(originalMermaid, legendContext);
@@ -319,13 +355,15 @@ export class MarkdownRenderer {
         containerDiv.id = `mermaid-chart-${++this.mermaidRenderSequence}`;
 
         const pre = codeEl.parentElement;
-        const blockId = pre.getAttribute('data-block-id');
+        const blockId = pre?.getAttribute('data-block-id');
         if (blockId) containerDiv.setAttribute('data-block-id', blockId);
-        pre.parentNode.replaceChild(containerDiv, pre);
+        if (pre?.parentNode) {
+          pre.parentNode.replaceChild(containerDiv, pre);
+        }
 
         try {
           const { svg } = await mermaid.render(`${containerDiv.id}-render`, mermaidSource);
-          if (!containerDiv.isConnected) return;
+          if (!containerDiv.isConnected) continue;
 
           containerDiv.innerHTML = svg;
           fitMermaidSvg(containerDiv.querySelector('svg'));
@@ -338,7 +376,7 @@ export class MarkdownRenderer {
           fallbackPre.appendChild(fallbackCode);
           containerDiv.replaceChildren(fallbackPre);
         }
-      }));
+      }
     }
   }
 }
