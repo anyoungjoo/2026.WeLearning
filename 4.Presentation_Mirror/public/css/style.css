@@ -332,6 +332,34 @@ input:checked + .slider:before {
   border-color: var(--accent-primary);
 }
 
+.sidebar-download {
+  padding: 0 14px 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-download-button {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid color-mix(in srgb, var(--accent-primary) 30%, var(--border-color));
+  border-radius: 6px;
+  background: var(--accent-light);
+  color: var(--accent-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.sidebar-download-button:hover {
+  border-color: var(--accent-primary);
+  filter: brightness(0.97);
+  transform: translateY(-1px);
+}
+
 .sidebar-tree {
   flex: 1;
   overflow-y: auto;
@@ -580,6 +608,51 @@ body[data-source-mode="desktop"] #viewer-container {
   border-radius: 8px;
   margin: 16px 0;
   border: 1px solid var(--border-color);
+}
+
+.mermaid-chart {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 20px 0;
+  padding: 12px 4px;
+  overflow-x: auto;
+  overflow-y: visible;
+  overscroll-behavior-inline: contain;
+  box-sizing: border-box;
+}
+
+.mermaid-chart svg {
+  display: block;
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.mermaid-chart.mermaid-error pre {
+  margin: 0;
+}
+
+.document-load-error {
+  padding: 60px 16px;
+  text-align: center;
+}
+
+.document-load-error > i {
+  margin-bottom: 16px;
+  color: var(--accent-warning);
+  font-size: 2.5rem;
+}
+
+.document-load-error h3 {
+  margin-bottom: 8px;
+}
+
+.document-load-error p {
+  margin-bottom: 20px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
 }
 
 #markdown-content table {

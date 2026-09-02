@@ -26,6 +26,7 @@ class PresentationApp {
     this.userInteractedTimeout = null;
     this.mediaConfigPromise = null;
     this.viewerConnectionGeneration = 0;
+    this.documentLoadGeneration = 0;
     this.isScreenShareTransitioning = false;
 
     // DOM 요소 캐싱
@@ -951,11 +952,17 @@ class PresentationApp {
 
         const header = document.createElement('div');
         header.className = 'tree-folder-title';
-        header.innerHTML = `
-          <span class="tree-caret"><i class="fas fa-chevron-down"></i></span>
-          <i class="fas fa-folder-open tree-folder-icon"></i>
-          <span>${node.name}</span>
-        `;
+        const caret = document.createElement('span');
+        caret.className = 'tree-caret';
+        caret.innerHTML = '<i class="fas fa-chevron-down"></i>';
+
+        const folderIcon = document.createElement('i');
+        folderIcon.className = 'fas fa-folder-open tree-folder-icon';
+
+        const folderName = document.createElement('span');
+        folderName.textContent = node.name;
+
+        header.append(caret, folderIcon, folderName);
 
         const childrenContainer = document.createElement('div');
         childrenContainer.className = 'tree-folder-children';
@@ -978,7 +985,14 @@ class PresentationApp {
         const fileEl = document.createElement('div');
         fileEl.className = 'tree-file-item';
         fileEl.dataset.path = node.path;
-        fileEl.innerHTML = `<i class="far fa-file-alt"></i> <span>${node.name.replace(/\.md$/i, '')}</span>`;
+
+        const fileIcon = document.createElement('i');
+        fileIcon.className = 'far fa-file-alt';
+
+        const fileName = document.createElement('span');
+        fileName.textContent = node.name;
+
+        fileEl.append(fileIcon, fileName);
 
         fileEl.addEventListener('click', () => {
           // 모바일에서는 문서 선택 시 사이드바 자동 닫기
@@ -1033,6 +1047,7 @@ class PresentationApp {
 
   async loadDocument(docPath, targetScrollRatio = 0, strokes = null, annotations = null) {
     if (!docPath) return;
+    const loadGeneration = ++this.documentLoadGeneration;
     this.currentDocPath = docPath;
 
     // 사이드바 활성 아이템 갱신
@@ -1062,12 +1077,14 @@ class PresentationApp {
     try {
       const res = await fetch(`/api/materials/file?path=${encodeURIComponent(docPath)}`);
       const data = await res.json();
+      if (loadGeneration !== this.documentLoadGeneration) return;
 
       if (data.success) {
         // 1) 마크다운 파싱 및 렌더링
         const html = this.renderer.render(data.content, docPath);
         this.dom.markdownContent.innerHTML = html;
-        this.renderer.postProcess(this.dom.markdownContent);
+        await this.renderer.postProcess(this.dom.markdownContent);
+        if (loadGeneration !== this.documentLoadGeneration) return;
 
         // 2) CSS 어노테이션 렌더링
         if (annotations !== null) {
@@ -1084,28 +1101,46 @@ class PresentationApp {
 
         // 5) 이미지 로딩 완료 후 2차 정밀 스크롤 보정 및 캔버스 리사이즈
         await this.waitForImagesAndResize();
+        if (loadGeneration !== this.documentLoadGeneration) return;
         this.applyScrollRatio(targetScrollRatio);
 
         // 레이아웃 안정화 후 3차 미세 보정 (300ms)
         setTimeout(() => {
+          if (loadGeneration !== this.documentLoadGeneration) return;
           this.applyScrollRatio(targetScrollRatio);
         }, 300);
       } else {
         throw new Error(data.message || '문서를 불러오지 못했습니다.');
       }
     } catch (err) {
+      if (loadGeneration !== this.documentLoadGeneration) return;
       console.error('문서 내용 로드 실패:', err);
-      this.dom.markdownContent.innerHTML = `
-        <div class="empty-state" style="text-align: center; padding: 60px 16px;">
-          <i class="fas fa-exclamation-circle" style="font-size: 2.5rem; color: var(--accent-warning); margin-bottom: 16px;"></i>
-          <h3 style="margin-bottom: 8px;">문서 로드 실패</h3>
-          <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">${err.message || '네트워크 연결을 확인해 주세요.'}</p>
-          <button class="btn-primary" onclick="window.app.loadDocument('${docPath}', ${targetScrollRatio})">
-            <i class="fas fa-redo"></i> 다시 시도
-          </button>
-        </div>
-      `;
+      this.renderDocumentLoadError(err, docPath, targetScrollRatio);
     }
+  }
+
+  renderDocumentLoadError(error, docPath, targetScrollRatio) {
+    const emptyState = document.createElement('div');
+    emptyState.className = 'empty-state document-load-error';
+
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-exclamation-circle';
+
+    const title = document.createElement('h3');
+    title.textContent = '문서 로드 실패';
+
+    const message = document.createElement('p');
+    message.textContent = error?.message || '네트워크 연결을 확인해 주세요.';
+
+    const retryButton = document.createElement('button');
+    retryButton.className = 'btn-primary';
+    retryButton.innerHTML = '<i class="fas fa-redo"></i> 다시 시도';
+    retryButton.addEventListener('click', () => {
+      this.loadDocument(docPath, targetScrollRatio);
+    });
+
+    emptyState.append(icon, title, message, retryButton);
+    this.dom.markdownContent.replaceChildren(emptyState);
   }
 
   waitForImagesAndResize() {
@@ -1113,8 +1148,8 @@ class PresentationApp {
     const promises = Array.from(images).map(img => {
       if (img.complete) return Promise.resolve();
       return new Promise(resolve => {
-        img.onload = resolve;
-        img.onerror = resolve;
+        img.addEventListener('load', resolve, { once: true });
+        img.addEventListener('error', resolve, { once: true });
       });
     });
 

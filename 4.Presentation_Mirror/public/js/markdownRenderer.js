@@ -9,8 +9,29 @@
  * 5. 목차(TOC)용 헤딩 앵커 자동 생성
  */
 
+export function fitMermaidSvg(svgElement) {
+  if (!svgElement) return;
+
+  const viewBox = String(svgElement.getAttribute('viewBox') || '')
+    .trim()
+    .split(/[\s,]+/)
+    .map(Number);
+  const naturalWidth = viewBox.length === 4 && Number.isFinite(viewBox[2]) && viewBox[2] > 0
+    ? Math.ceil(viewBox[2])
+    : null;
+
+  svgElement.removeAttribute('width');
+  svgElement.removeAttribute('height');
+  svgElement.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  svgElement.style.width = naturalWidth ? `min(100%, ${naturalWidth}px)` : '100%';
+  svgElement.style.maxWidth = '100%';
+  svgElement.style.height = 'auto';
+  svgElement.style.overflow = 'visible';
+}
+
 export class MarkdownRenderer {
   constructor() {
+    this.mermaidRenderSequence = 0;
     this.initMarked();
   }
 
@@ -130,7 +151,7 @@ export class MarkdownRenderer {
    * 렌더링된 DOM 요소 후처리 (코드 하이라이팅, 복사 버튼, Mermaid 렌더링, 블록 ID 주입)
    * @param {HTMLElement} containerElement 마크다운이 삽입된 DOM 컨테이너
    */
-  postProcess(containerElement) {
+  async postProcess(containerElement) {
     if (!containerElement) return;
 
     // 0) 모든 마크다운 블록 요소에 고유 data-block-id 부여 (CSS 어노테이션 & 정밀 판서 매핑용)
@@ -179,28 +200,36 @@ export class MarkdownRenderer {
 
     // 2) Mermaid.js 다이어그램 렌더링
     if (typeof mermaid !== 'undefined') {
-      const mermaidBlocks = containerElement.querySelectorAll('pre code.language-mermaid');
-      mermaidBlocks.forEach((codeEl, idx) => {
+      const mermaidBlocks = Array.from(
+        containerElement.querySelectorAll('pre code.language-mermaid')
+      );
+      await Promise.all(mermaidBlocks.map(async (codeEl) => {
         const rawMermaid = codeEl.innerText;
         const containerDiv = document.createElement('div');
         containerDiv.className = 'mermaid-chart';
-        containerDiv.style.display = 'flex';
-        containerDiv.style.justifyContent = 'center';
-        containerDiv.style.margin = '20px 0';
-        containerDiv.id = `mermaid-svg-${idx}-${Date.now()}`;
-        
+        containerDiv.id = `mermaid-chart-${++this.mermaidRenderSequence}`;
+
         const pre = codeEl.parentElement;
+        const blockId = pre.getAttribute('data-block-id');
+        if (blockId) containerDiv.setAttribute('data-block-id', blockId);
         pre.parentNode.replaceChild(containerDiv, pre);
 
         try {
-          mermaid.render(containerDiv.id + '-render', rawMermaid).then(({ svg }) => {
-            containerDiv.innerHTML = svg;
-          });
+          const { svg } = await mermaid.render(`${containerDiv.id}-render`, rawMermaid);
+          if (!containerDiv.isConnected) return;
+
+          containerDiv.innerHTML = svg;
+          fitMermaidSvg(containerDiv.querySelector('svg'));
         } catch (err) {
           console.warn('Mermaid rendering error:', err);
-          containerDiv.innerText = rawMermaid;
+          containerDiv.classList.add('mermaid-error');
+          const fallbackPre = document.createElement('pre');
+          const fallbackCode = document.createElement('code');
+          fallbackCode.textContent = rawMermaid;
+          fallbackPre.appendChild(fallbackCode);
+          containerDiv.replaceChildren(fallbackPre);
         }
-      });
+      }));
     }
   }
 }

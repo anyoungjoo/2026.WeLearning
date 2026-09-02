@@ -16,6 +16,8 @@ import fs from 'fs';
 import os from 'os';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
+import { buildMaterialsArchiveName, createMaterialsZipArchive } from './materialsArchive.js';
+import { isPathWithinBase } from './pathSecurity.js';
 
 // ----------------------------------------------------
 // 1. 기본 경로 및 서버 인스턴스 초기화
@@ -121,14 +123,6 @@ function scanDirectory(dirPath, baseDir) {
   return result;
 }
 
-/**
- * 안전한 경로 검증 (Path Traversal 공격 방지)
- */
-function isSafePath(baseDir, targetRelPath) {
-  const safePath = path.resolve(baseDir, targetRelPath);
-  return safePath.startsWith(baseDir);
-}
-
 // ----------------------------------------------------
 // 4. REST API 라우트 정의
 // ----------------------------------------------------
@@ -144,7 +138,51 @@ app.get('/api/materials/tree', (req, res) => {
   }
 });
 
-// 2) 특정 마크다운 문서 내용 조회
+// 2) 교육자료 전체 ZIP 다운로드
+app.get('/api/materials/download', (req, res) => {
+  if (!fs.existsSync(MATERIALS_DIR) || !fs.statSync(MATERIALS_DIR).isDirectory()) {
+    return res.status(404).json({
+      success: false,
+      message: '다운로드할 교육자료 폴더를 찾을 수 없습니다.'
+    });
+  }
+
+  const archiveName = buildMaterialsArchiveName();
+  const archive = createMaterialsZipArchive(MATERIALS_DIR);
+  let archiveFailed = false;
+
+  const handleArchiveError = (error) => {
+    if (archiveFailed) return;
+    archiveFailed = true;
+    console.error('교육자료 ZIP 생성 실패:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: '교육자료 ZIP 생성에 실패했습니다.' });
+    } else if (!res.destroyed) {
+      res.destroy(error);
+    }
+  };
+
+  archive.on('warning', (error) => {
+    if (error.code === 'ENOENT') {
+      console.warn('교육자료 ZIP 생성 중 일부 파일을 찾지 못했습니다:', error.message);
+      return;
+    }
+    handleArchiveError(error);
+  });
+
+  archive.on('error', handleArchiveError);
+
+  res.on('close', () => {
+    if (!res.writableEnded) archive.abort();
+  });
+
+  res.attachment(archiveName);
+  res.setHeader('Cache-Control', 'no-store');
+  archive.pipe(res);
+  void archive.finalize().catch(handleArchiveError);
+});
+
+// 3) 특정 마크다운 문서 내용 조회
 app.get('/api/materials/file', (req, res) => {
   let filePath = req.query.path;
   if (!filePath) {
@@ -160,7 +198,7 @@ app.get('/api/materials/file', (req, res) => {
     // 디코딩 실패 시 원본 사용
   }
 
-  if (!isSafePath(MATERIALS_DIR, filePath)) {
+  if (!isPathWithinBase(MATERIALS_DIR, filePath)) {
     return res.status(403).json({ success: false, message: '접근이 허용되지 않은 경로입니다.' });
   }
 
@@ -183,10 +221,16 @@ app.get('/api/materials/file', (req, res) => {
   }
 });
 
-// 3) 마크다운 내부 이미지 및 첨부파일 서빙 (Raw Media Streaming)
+// 4) 마크다운 내부 이미지 및 첨부파일 서빙 (Raw Media Streaming)
 app.get('/api/materials/raw/*', (req, res) => {
-  const reqPath = decodeURIComponent(req.params[0] || '');
-  if (!isSafePath(MATERIALS_DIR, reqPath)) {
+  let reqPath;
+  try {
+    reqPath = decodeURIComponent(req.params[0] || '');
+  } catch {
+    return res.status(400).send('Invalid Path Encoding');
+  }
+
+  if (!isPathWithinBase(MATERIALS_DIR, reqPath)) {
     return res.status(403).send('Forbidden');
   }
 
@@ -218,7 +262,7 @@ function getLocalIPs() {
   return addresses;
 }
 
-// 4) 서버 기본 상태 및 호스트 IP 목록 조회
+// 5) 서버 기본 상태 및 호스트 IP 목록 조회
 app.get('/api/status', (req, res) => {
   const hostIps = getLocalIPs();
   res.json({
@@ -232,7 +276,7 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// 5) 브라우저가 MediaMTX WHIP/WHEP 주소를 구성하는 데 필요한 공개 설정
+// 6) 브라우저가 MediaMTX WHIP/WHEP 주소를 구성하는 데 필요한 공개 설정
 app.get('/api/runtime-config', (req, res) => {
   res.json({
     success: true,
@@ -244,7 +288,7 @@ app.get('/api/runtime-config', (req, res) => {
   });
 });
 
-// 6) 실시간 노션형 라이브 노트패드 상태 조회 API
+// 7) 실시간 노션형 라이브 노트패드 상태 조회 API
 app.get('/api/notepad', (req, res) => {
   res.json({
     success: true,
@@ -252,7 +296,7 @@ app.get('/api/notepad', (req, res) => {
   });
 });
 
-// 7) 실시간 노션형 노트패드 이미지 업로드 API (클립보드 붙여넣기 및 파일 드롭)
+// 8) 실시간 노션형 노트패드 이미지 업로드 API (클립보드 붙여넣기 및 파일 드롭)
 app.post('/api/notepad/upload', (req, res) => {
   try {
     const { image, filename } = req.body;
