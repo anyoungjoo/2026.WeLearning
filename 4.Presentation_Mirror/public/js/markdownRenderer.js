@@ -241,6 +241,8 @@ export class MarkdownRenderer {
   render(markdownText, currentDocPath = '') {
     if (!markdownText) return '<div class="empty-state">문서 내용이 비어있습니다.</div>';
 
+    this.currentDocPath = currentDocPath;
+
     // 1단계: 마크다운 텍스트 내 이미지 상대 경로를 API 서빙 URL로 사전 치환
     let processed = this.resolveImagePaths(markdownText, currentDocPath);
 
@@ -277,6 +279,8 @@ export class MarkdownRenderer {
     escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>');
     // 이미지
     escaped = escaped.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width:100%; border-radius:8px;" />');
+    // 일반 링크
+    escaped = escaped.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
     // 인용구
     escaped = escaped.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
     // 줄바꿈
@@ -371,12 +375,31 @@ export class MarkdownRenderer {
       img.loading = 'lazy';
     });
 
-    // 0-3) 외부 링크 및 인터랙티브 HTML 뷰어 링크에 새 탭(target="_blank") 속성 부여
+    // 0-3) 링크 요소 후처리 (외부 링크, HTML 인터랙티브 뷰어, 내부 마크다운 문서 링크 분기)
+    const docDir = this.currentDocPath && this.currentDocPath.includes('/')
+      ? this.currentDocPath.substring(0, this.currentDocPath.lastIndexOf('/'))
+      : '';
+
     containerElement.querySelectorAll('a[href]').forEach((a) => {
-      const href = a.getAttribute('href') || '';
-      if (href.startsWith('http') || href.includes('/api/materials/raw/') || href.endsWith('.html')) {
+      const rawHref = a.getAttribute('href') || '';
+      if (!rawHref) return;
+
+      // 1. 외부 링크 또는 인터랙티브 HTML 뷰어 링크 -> 새 탭에서 열기
+      if (rawHref.startsWith('http://') || rawHref.startsWith('https://') || rawHref.includes('/api/materials/raw/') || rawHref.endsWith('.html')) {
         a.setAttribute('target', '_blank');
         a.setAttribute('rel', 'noopener noreferrer');
+        return;
+      }
+
+      // 2. 내부 마크다운 문서 링크 (.md, .markdown) -> 프레젠테이션 미러 내비게이션으로 연결
+      const mdMatch = rawHref.match(/^(.*?\.md|.*?\.markdown)(?:([?#].*))?$/i);
+      if (mdMatch) {
+        let cleanPath = decodeURIComponent(mdMatch[1]).trim();
+        const resolvedDocPath = this.combinePaths(docDir, cleanPath);
+        a.setAttribute('data-target-doc', resolvedDocPath);
+        a.classList.add('doc-nav-link');
+        a.setAttribute('href', '#'); // 브라우저 페이지 전체 이동 방지
+        a.title = `클릭하여 '${cleanPath}' 교재 문서로 이동`;
       }
     });
 

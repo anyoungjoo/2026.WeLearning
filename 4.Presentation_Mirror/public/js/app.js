@@ -690,6 +690,36 @@ class PresentationApp {
       });
     }
 
+    // 1-2) 마크다운 본문 내 .md 교재 링크 클릭 시 즉시 화면 전환 및 동기화
+    this.dom.markdownContent.addEventListener('click', (e) => {
+      const docLink = e.target.closest('a.doc-nav-link, a[data-target-doc]');
+      if (!docLink) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const rawTarget = docLink.getAttribute('data-target-doc');
+      const targetDoc = this.resolveDocPath(rawTarget);
+      if (!targetDoc) return;
+
+      // 모바일에서는 문서 이동 시 사이드바 닫기
+      if (window.innerWidth <= 768) {
+        this.dom.sidebar.classList.add('collapsed');
+      }
+
+      if (this.sync.isPresenter) {
+        // 강사: 전체 수강생 화면 동기화 + 문서 로드
+        this.sync.broadcastDocChange(targetDoc);
+        this.loadDocument(targetDoc);
+        this.showToast(`📢 '${this.getDocName(targetDoc)}' 교재로 이동했습니다. (전체 동기화)`);
+      } else {
+        // 수강생: 자유 모드 전환 + 문서 로드
+        this.sync.setFollowMode(false);
+        this.loadDocument(targetDoc);
+        this.showToast(`🟡 '${this.getDocName(targetDoc)}' 문서를 열람합니다. (자유 모드)`);
+      }
+    });
+
     // 2) 사이드바 검색
     this.dom.inputSearch.addEventListener('input', (e) => {
       this.filterSidebarTree(e.target.value.trim().toLowerCase());
@@ -1430,6 +1460,54 @@ class PresentationApp {
     if (!path) return '문서 선택';
     const filename = path.split('/').pop();
     return filename.replace(/\.md$/i, '');
+  }
+
+  /**
+   * 마크다운 본문 링크에서 전달된 상대 경로를 실제 교육자료 트리 내의 올바른 docPath로 안전하게 해결합니다.
+   * 1) 정확한 경로 일치
+   * 2) 현재 문서 디렉토리 기준 결합 경로 일치
+   * 3) 파일명(Basename) 일치 검색
+   * 4) 번호 접두어 및 파일명 유사(Fuzzy) 검색
+   */
+  resolveDocPath(rawPath) {
+    if (!rawPath || !this.allDocPaths || this.allDocPaths.length === 0) return rawPath;
+
+    let clean = decodeURIComponent(rawPath).trim().replace(/\\/g, '/');
+    if (clean.startsWith('./')) clean = clean.substring(2);
+    if (clean.startsWith('/')) clean = clean.substring(1);
+
+    // 1) 정확한 경로 일치
+    if (this.allDocPaths.includes(clean)) {
+      return clean;
+    }
+
+    // 2) 현재 문서 디렉토리 기준 상대 경로 결합
+    if (this.currentDocPath && this.currentDocPath.includes('/')) {
+      const docDir = this.currentDocPath.substring(0, this.currentDocPath.lastIndexOf('/'));
+      const combined = this.renderer.combinePaths(docDir, clean);
+      if (this.allDocPaths.includes(combined)) {
+        return combined;
+      }
+    }
+
+    // 3) 파일명(basename) 기준 매칭
+    const targetBase = clean.split('/').pop().toLowerCase();
+    const foundByBase = this.allDocPaths.find(p => p.split('/').pop().toLowerCase() === targetBase);
+    if (foundByBase) {
+      return foundByBase;
+    }
+
+    // 4) 파일명 정규화(공백/특수문자 제거) 유사 검색
+    const targetNormalized = targetBase.replace(/[\s_\-.]+/g, '');
+    const foundByFuzzy = this.allDocPaths.find(p => {
+      const pNorm = p.split('/').pop().toLowerCase().replace(/[\s_\-.]+/g, '');
+      return pNorm.includes(targetNormalized) || targetNormalized.includes(pNorm);
+    });
+    if (foundByFuzzy) {
+      return foundByFuzzy;
+    }
+
+    return clean;
   }
 
   filterSidebarTree(query) {
