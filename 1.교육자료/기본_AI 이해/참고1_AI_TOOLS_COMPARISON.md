@@ -9,6 +9,7 @@
 AI 도구는 개발에 얼마나 관여하느냐에 따라 **Chat UI**, **CLI Agent**, **Agentic IDE** 3가지 단계로 진화했다.
 
 ![AI 도구 비교 다이어그램](./images/ref_diagram_1.svg)
+> 💡 *크롬 브라우저에서 [인터랙티브 다이어그램(HTML)](./images/ref_diagram_1.html)을 열어 세대별 비교 흐름을 인터랙티브하게 탐색할 수 있습니다.*
 
 ### 📊 AI 도구 종합 비교 명세표
 
