@@ -51,8 +51,11 @@ const MEDIA_MTX_WEBRTC_URL = (process.env.MEDIA_MTX_WEBRTC_URL || '').replace(/\
 // 대용량 이미지(스크린샷 붙여넣기 등) 처리를 위한 본문 크기 제한 확장
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+// 💡 인터랙티브 다이어그램 뷰어 및 교육자료 정적 자산 서빙
+app.use('/interactive', express.static(path.join(__dirname, 'public/interactive')));
+app.use('/images', express.static(path.join(MATERIALS_DIR, 'images')));
+app.use('/기본_AI 이해/images', express.static(path.join(MATERIALS_DIR, '기본_AI 이해/images')));
 
 // 파비콘 404 방지 핸들러
 app.get('/favicon.ico', (req, res) => {

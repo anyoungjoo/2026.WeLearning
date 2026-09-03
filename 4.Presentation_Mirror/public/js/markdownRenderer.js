@@ -313,6 +313,17 @@ export class MarkdownRenderer {
       return match.replace(src, `/api/materials/raw/${encodeURIComponent(resolvedPath)}`);
     });
 
+    // Markdown 일반 링크 중 상대경로 .html 링크: [text](url.html) -> /api/materials/raw/... 로 보정
+    const mdHtmlLinkRegex = /\[(.*?)\]\((.*?\.html(?:[?#][^\s)]*)?)\)/gi;
+    result = result.replace(mdHtmlLinkRegex, (match, text, href) => {
+      const cleanHref = href.trim().split(' ')[0];
+      if (cleanHref.startsWith('http://') || cleanHref.startsWith('https://') || cleanHref.startsWith('/')) {
+        return match;
+      }
+      const resolvedPath = this.combinePaths(docDir, cleanHref);
+      return `[${text}](/api/materials/raw/${encodeURIComponent(resolvedPath)})`;
+    });
+
     return result;
   }
 
@@ -358,6 +369,15 @@ export class MarkdownRenderer {
     containerElement.querySelectorAll('img:not(.rendered-diagram-img)').forEach((img) => {
       img.classList.add('rendered-diagram-img');
       img.loading = 'lazy';
+    });
+
+    // 0-3) 외부 링크 및 인터랙티브 HTML 뷰어 링크에 새 탭(target="_blank") 속성 부여
+    containerElement.querySelectorAll('a[href]').forEach((a) => {
+      const href = a.getAttribute('href') || '';
+      if (href.startsWith('http') || href.includes('/api/materials/raw/') || href.endsWith('.html')) {
+        a.setAttribute('target', '_blank');
+        a.setAttribute('rel', 'noopener noreferrer');
+      }
     });
 
     // 1) Highlight.js 구문 강조 및 복사 버튼 부착
