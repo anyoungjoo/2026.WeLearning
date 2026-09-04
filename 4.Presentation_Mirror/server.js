@@ -24,6 +24,7 @@ import { isPathWithinBase } from './pathSecurity.js';
 // ----------------------------------------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const NODE_MODULES_DIR = path.join(__dirname, 'node_modules');
 
 const app = express();
 const server = http.createServer(app);
@@ -51,6 +52,30 @@ const MEDIA_MTX_WEBRTC_URL = (process.env.MEDIA_MTX_WEBRTC_URL || '').replace(/\
 // 대용량 이미지(스크린샷 붙여넣기 등) 처리를 위한 본문 크기 제한 확장
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
+
+// 1단계: 화면 렌더링에 필요한 라이브러리는 외부 CDN이 아니라 설치된 로컬 패키지에서 제공합니다.
+// 필요한 파일과 폰트 폴더만 공개하여 node_modules 전체가 노출되지 않도록 제한합니다.
+const vendorAssets = {
+  '/vendor/marked.min.js': path.join(NODE_MODULES_DIR, 'marked/marked.min.js'),
+  '/vendor/highlight.min.js': path.join(NODE_MODULES_DIR, '@highlightjs/cdn-assets/highlight.min.js'),
+  '/vendor/powershell.min.js': path.join(NODE_MODULES_DIR, '@highlightjs/cdn-assets/languages/powershell.min.js'),
+  '/vendor/github-dark.min.css': path.join(NODE_MODULES_DIR, '@highlightjs/cdn-assets/styles/github-dark.min.css'),
+  '/vendor/mermaid.min.js': path.join(NODE_MODULES_DIR, 'mermaid/dist/mermaid.min.js'),
+  '/vendor/fontawesome/css/all.min.css': path.join(NODE_MODULES_DIR, '@fortawesome/fontawesome-free/css/all.min.css')
+};
+
+for (const [route, assetPath] of Object.entries(vendorAssets)) {
+  app.get(route, (req, res, next) => {
+    res.sendFile(assetPath, error => {
+      if (error) next(error);
+    });
+  });
+}
+app.use(
+  '/vendor/fontawesome/webfonts',
+  express.static(path.join(NODE_MODULES_DIR, '@fortawesome/fontawesome-free/webfonts'), { index: false })
+);
+
 app.use(express.static(path.join(__dirname, 'public')));
 // 💡 인터랙티브 다이어그램 뷰어 및 교육자료 정적 자산 서빙
 app.use('/interactive', express.static(path.join(__dirname, 'public/interactive')));

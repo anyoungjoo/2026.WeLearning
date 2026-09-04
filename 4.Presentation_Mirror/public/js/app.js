@@ -13,6 +13,7 @@ import { SyncEngine } from './syncEngine.js';
 import { ScreenShareManager } from './screenShare.js';
 import { TextAnnotationEngine } from './textAnnotation.js';
 import { NotepadEngine } from './notepad.js';
+import { waitForImagesToSettle } from './imageLoadWaiter.js';
 
 class PresentationApp {
   constructor() {
@@ -27,6 +28,7 @@ class PresentationApp {
     this.mediaConfigPromise = null;
     this.viewerConnectionGeneration = 0;
     this.documentLoadGeneration = 0;
+    this.documentLoadController = null;
     this.isScreenShareTransitioning = false;
 
     // DOM 요소 캐싱
@@ -1093,8 +1095,16 @@ class PresentationApp {
 
   async loadDocument(docPath, targetScrollRatio = 0, strokes = null, annotations = null) {
     if (!docPath) return;
+
+    // 1단계: 새 문서를 열면 이전 fetch·이미지 대기·Mermaid 후처리를 즉시 취소합니다.
+    this.documentLoadController?.abort();
+    const loadController = new AbortController();
+    this.documentLoadController = loadController;
+    const { signal } = loadController;
     const loadGeneration = ++this.documentLoadGeneration;
+    const isCurrentLoad = () => !signal.aborted && loadGeneration === this.documentLoadGeneration;
     this.currentDocPath = docPath;
+    let hasRenderedContent = false;
 
     // 사이드바 활성 아이템 갱신
     this.dom.sidebarTree.querySelectorAll('.tree-file-item').forEach(el => {
@@ -1121,16 +1131,24 @@ class PresentationApp {
     }
 
     try {
-      const res = await fetch(`/api/materials/file?path=${encodeURIComponent(docPath)}`);
+      const res = await fetch(`/api/materials/file?path=${encodeURIComponent(docPath)}`, { signal });
       const data = await res.json();
-      if (loadGeneration !== this.documentLoadGeneration) return;
+      if (!isCurrentLoad()) return;
 
       if (data.success) {
         // 1) 마크다운 파싱 및 렌더링
         const html = this.renderer.render(data.content, docPath);
         this.dom.markdownContent.innerHTML = html;
-        await this.renderer.postProcess(this.dom.markdownContent);
-        if (loadGeneration !== this.documentLoadGeneration) return;
+        hasRenderedContent = true;
+
+        // 2단계: 선택 기능 하나가 실패해도 이미 표시한 정상 본문은 보존합니다.
+        try {
+          await this.renderer.postProcess(this.dom.markdownContent, { signal, isCurrent: isCurrentLoad });
+        } catch (postProcessError) {
+          if (!isCurrentLoad()) return;
+          console.warn('문서 후처리 일부를 건너뜁니다:', postProcessError);
+        }
+        if (!isCurrentLoad()) return;
 
         // 2) CSS 어노테이션 렌더링
         if (annotations !== null) {
@@ -1152,15 +1170,15 @@ class PresentationApp {
         }
 
         // 5) 이미지 로딩 완료 후 2차 정밀 스크롤 보정 (사용자가 이미 수동 스크롤을 시작하지 않은 경우에만)
-        await this.waitForImagesAndResize();
-        if (loadGeneration !== this.documentLoadGeneration) return;
+        await this.waitForImagesAndResize(signal);
+        if (!isCurrentLoad()) return;
         if (!this.userHasScrolledManually && targetScrollRatio > 0) {
           this.applyScrollRatio(targetScrollRatio);
         }
 
         // 레이아웃 안정화 후 3차 미세 보정 (사용자가 수동 스크롤하지 않은 경우에만)
         setTimeout(() => {
-          if (loadGeneration !== this.documentLoadGeneration) return;
+          if (!isCurrentLoad()) return;
           if (!this.userHasScrolledManually && targetScrollRatio > 0) {
             this.applyScrollRatio(targetScrollRatio);
           }
@@ -1169,8 +1187,12 @@ class PresentationApp {
         throw new Error(data.message || '문서를 불러오지 못했습니다.');
       }
     } catch (err) {
-      if (loadGeneration !== this.documentLoadGeneration) return;
+      if (!isCurrentLoad() || err?.name === 'AbortError') return;
       console.error('문서 내용 로드 실패:', err);
+      if (hasRenderedContent) {
+        console.warn('본문은 유지하고 실패한 후처리만 건너뜁니다.');
+        return;
+      }
       this.renderDocumentLoadError(err, docPath, targetScrollRatio);
     }
   }
@@ -1199,19 +1221,13 @@ class PresentationApp {
     this.dom.markdownContent.replaceChildren(emptyState);
   }
 
-  waitForImagesAndResize() {
+  async waitForImagesAndResize(signal) {
     const images = this.dom.markdownContent.querySelectorAll('img');
-    const promises = Array.from(images).map(img => {
-      if (img.complete) return Promise.resolve();
-      return new Promise(resolve => {
-        img.addEventListener('load', resolve, { once: true });
-        img.addEventListener('error', resolve, { once: true });
-      });
-    });
-
-    return Promise.all(promises).then(() => {
-      this.whiteboard.resize();
-    });
+    const result = await waitForImagesToSettle(images, { signal, timeoutMs: 4000 });
+    if (result.status === 'timeout') {
+      console.warn(`이미지 ${result.pendingCount}개가 제한 시간 안에 완료되지 않아 문서 표시를 계속합니다.`);
+    }
+    if (!signal?.aborted) this.whiteboard.resize();
   }
 
   // ----------------------------------------------------

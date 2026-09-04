@@ -34,7 +34,7 @@
   <g transform="translate(25, 48)">
     <rect x="0" y="10" width="240" height="90" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5" filter="url(#softShadow)"/>
     <text x="120" y="38" fill="#1d4ed8" font-size="13" font-weight="700" text-anchor="middle">🌟 Main Agent (메인 창)</text>
-    <text x="120" y="60" fill="#2563eb" font-size="11" text-anchor="middle">• 아키텍처 설계 & 코드 반영</text>
+    <text x="120" y="60" fill="#2563eb" font-size="11" text-anchor="middle">• 아키텍처 설계 &amp; 코드 반영</text>
     <text x="120" y="78" fill="#059669" font-size="11" font-weight="700" text-anchor="middle">• 깨끗한 Context 유지 (0% 오염)</text>
 
     <path d="M 240 35 L 340 35" stroke="#2563eb" stroke-width="1.5" marker-end="url(#arrowBlue)"/>

@@ -765,21 +765,6 @@ body[data-source-mode="desktop"] #viewer-container {
   box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.08);
 }
 
-.mermaid-chart {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  margin: 24px 0;
-  overflow: visible;
-}
-
-.mermaid-chart svg {
-  width: 100% !important;
-  max-width: 860px !important;
-  height: auto !important;
-}
-
 /* CSS Text Annotation Styles (Highlighter & Underline) */
 .pm-text-highlight {
   background-color: #fde047;
@@ -1928,4 +1913,3 @@ a.doc-nav-link:hover {
   background-color: #3b82f6;
   color: #ffffff !important;
 }
-

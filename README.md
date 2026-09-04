@@ -55,6 +55,6 @@
 ## 권장 환경
 
 - **브라우저**: Google Chrome (개발자 모드 활성화)
-- **런타임**: Node.js v20 이상
+- **런타임**: Node.js 24 LTS 권장 (v22 이상 지원)
 - **개발 도구**: Antigravity IDE 또는 VS Code
 - **AI 서비스**: OpenRouter, Google Gemini, Anthropic Claude

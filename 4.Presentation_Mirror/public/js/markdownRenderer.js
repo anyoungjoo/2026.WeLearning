@@ -10,6 +10,15 @@
  */
 
 const MERMAID_VIEWBOX_PADDING = 12;
+const MERMAID_SOURCE_MAX_LENGTH = 20000;
+const MERMAID_PARSE_TIMEOUT_MS = 1200;
+const MERMAID_RENDER_TIMEOUT_MS = 3000;
+
+function createAbortError() {
+  const error = new Error('문서 렌더링이 취소되었습니다.');
+  error.name = 'AbortError';
+  return error;
+}
 
 function escapeMermaidLabel(value) {
   return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -35,8 +44,8 @@ function extractLegacyRadarLegend(contextText, seriesCount) {
 export function normalizeEdgeLabels(source) {
   const lines = String(source || '').split(/\r?\n/);
   const processed = lines.map((line) => {
-    // 엣지 라벨 |label| 매칭
-    return line.replace(/\|([^|\r\n]+)\|/g, (match, label) => {
+    // 노드 본문의 파이프 문자는 건드리지 않고, 실제 엣지 연산자 바로 뒤의 |label|만 매칭합니다.
+    return line.replace(/((?:-->|---|-\.->|==>|--x|--o)\s*)\|([^|\r\n]+)\|/g, (match, edge, label) => {
       const trimmed = label.trim();
       // 이미 큰따옴표로 둘러싸여 있는 경우 건너뜀
       if (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length >= 2) {
@@ -44,7 +53,7 @@ export function normalizeEdgeLabels(source) {
       }
       // 큰따옴표로 안전하게 감싸고 내부 이스케이프
       const escaped = trimmed.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-      return `|"${escaped}"|`;
+      return `${edge}|"${escaped}"|`;
     });
   });
   return processed.join('\n');
@@ -55,7 +64,10 @@ export function normalizeEdgeLabels(source) {
  * 2. flowchart/graph 등의 엣지 라벨에 특수문자/괄호가 있을 때 파싱 오류를 방지하기 위해 큰따옴표로 자동 정규화합니다.
  */
 export function normalizeMermaidSource(source, contextText = '') {
-  const originalSource = String(source || '');
+  const originalSource = String(source || '').trim();
+  if (originalSource.length > MERMAID_SOURCE_MAX_LENGTH) {
+    throw new Error(`Mermaid 소스가 허용 크기(${MERMAID_SOURCE_MAX_LENGTH}자)를 초과했습니다.`);
+  }
   const lines = originalSource.trim().split(/\r?\n/);
   
   // radar 문법 변환
@@ -86,8 +98,10 @@ export function normalizeMermaidSource(source, contextText = '') {
     }
 
     const seriesNames = extractLegacyRadarLegend(contextText, seriesCount);
-    const allValues = metrics.flatMap(metric => metric.values);
-    const highestValue = Math.max(...allValues);
+    const highestValue = metrics.reduce(
+      (currentMax, metric) => metric.values.reduce((max, value) => Math.max(max, value), currentMax),
+      0
+    );
     const scaleMax = highestValue <= 10 ? 10 : Math.ceil(highestValue);
     const output = ['radar-beta'];
 
@@ -165,17 +179,25 @@ export function fitMermaidSvg(svgElement) {
 }
 
 export class MarkdownRenderer {
-  constructor() {
+  constructor({
+    markedLibrary = globalThis.marked,
+    highlightLibrary = globalThis.hljs,
+    mermaidLibrary = globalThis.mermaid
+  } = {}) {
     this.mermaidRenderSequence = 0;
+    this.activeMermaidOperation = null;
+    this.marked = markedLibrary;
+    this.hljs = highlightLibrary;
+    this.mermaid = mermaidLibrary;
     this.initMarked();
     this.initHighlightJs();
     this.initMermaid();
   }
 
   initMermaid() {
-    if (typeof mermaid !== 'undefined') {
+    if (this.mermaid) {
       try {
-        mermaid.initialize({
+        this.mermaid.initialize({
           startOnLoad: false,
           securityLevel: 'loose',
           theme: 'dark',
@@ -190,25 +212,81 @@ export class MarkdownRenderer {
   }
 
   initHighlightJs() {
-    if (typeof hljs !== 'undefined' && typeof hljs.registerAliases === 'function') {
-      hljs.registerAliases('jsonc', { languageName: 'json' });
-      hljs.registerAliases(['powershell', 'ps1', 'pwsh', 'ps'], { languageName: 'powershell' });
+    if (this.hljs && typeof this.hljs.registerAliases === 'function') {
+      this.hljs.registerAliases('jsonc', { languageName: 'json' });
+      this.hljs.registerAliases(['powershell', 'ps1', 'pwsh', 'ps'], { languageName: 'powershell' });
     }
   }
 
   initMarked() {
-    if (typeof marked === 'undefined') {
+    if (!this.marked) {
       console.warn('Marked library not yet loaded.');
       return;
     }
 
     // Marked 옵션 설정
-    marked.setOptions({
+    this.marked.setOptions({
       gfm: true,
       breaks: true,
       pedantic: false,
       smartLists: true,
       smartypants: true
+    });
+  }
+
+  /**
+   * Mermaid는 내부적으로 렌더링 작업을 한 줄로 처리합니다. 한 작업이 멈춘 동안
+   * 다음 작업을 계속 줄 세우지 않도록, 현재 작업 하나만 추적하고 호출 쪽에는
+   * 취소 신호와 제한 시간을 적용합니다.
+   */
+  runMermaidOperation(operationFactory, { signal, timeoutMs, label }) {
+    if (signal?.aborted) return Promise.reject(createAbortError());
+    if (this.activeMermaidOperation) {
+      return Promise.reject(new Error(
+        `이전 Mermaid ${this.activeMermaidOperation.label} 작업이 아직 끝나지 않았습니다.`
+      ));
+    }
+
+    const operationPromise = Promise.resolve().then(operationFactory);
+    const trackedOperation = { label, promise: operationPromise };
+    this.activeMermaidOperation = trackedOperation;
+
+    // 호출 쪽이 제한 시간으로 먼저 끝나더라도 실제 Mermaid 작업이 끝날 때까지
+    // active 상태를 유지하여 후속 문서가 같은 전역 큐에 쌓이지 않게 합니다.
+    operationPromise.then(
+      () => {
+        if (this.activeMermaidOperation === trackedOperation) this.activeMermaidOperation = null;
+      },
+      () => {
+        if (this.activeMermaidOperation === trackedOperation) this.activeMermaidOperation = null;
+      }
+    );
+
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      let timerId = null;
+
+      const cleanup = () => {
+        if (timerId !== null) clearTimeout(timerId);
+        signal?.removeEventListener('abort', handleAbort);
+      };
+      const finish = (handler, value) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        handler(value);
+      };
+      const handleAbort = () => finish(reject, createAbortError());
+
+      signal?.addEventListener('abort', handleAbort, { once: true });
+      timerId = setTimeout(
+        () => finish(reject, new Error(`Mermaid ${label} 제한 시간 초과 (${timeoutMs}ms)`)),
+        timeoutMs
+      );
+      operationPromise.then(
+        result => finish(resolve, result),
+        error => finish(reject, error)
+      );
     });
   }
 
@@ -250,9 +328,9 @@ export class MarkdownRenderer {
     processed = this.processCallouts(processed);
 
     // 3단계: Marked.js 파싱
-    if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
+    if (this.marked && typeof this.marked.parse === 'function') {
       try {
-        return marked.parse(processed);
+        return this.marked.parse(processed);
       } catch (err) {
         console.warn('Marked parsing error, falling back:', err);
       }
@@ -350,8 +428,11 @@ export class MarkdownRenderer {
    * 렌더링된 DOM 요소 후처리 (코드 하이라이팅, 복사 버튼, Mermaid 렌더링, 블록 ID 주입)
    * @param {HTMLElement} containerElement 마크다운이 삽입된 DOM 컨테이너
    */
-  async postProcess(containerElement) {
+  async postProcess(containerElement, { signal, isCurrent = () => true } = {}) {
     if (!containerElement) return;
+
+    const ownerDocument = containerElement.ownerDocument || document;
+    const shouldContinue = () => !signal?.aborted && isCurrent();
 
     // 0) 모든 마크다운 블록 요소에 고유 data-block-id 부여 (CSS 어노테이션 & 정밀 판서 매핑용)
     const blockSelectors = 'h1, h2, h3, h4, h5, h6, p, li, blockquote, pre, tr, img, table';
@@ -363,7 +444,7 @@ export class MarkdownRenderer {
     // 0-1) 모든 마크다운 Table을 반응형 스크롤 컨테이너로 안전하게 래핑
     containerElement.querySelectorAll('table:not(.wrapped)').forEach((table) => {
       table.classList.add('wrapped');
-      const wrapper = document.createElement('div');
+      const wrapper = ownerDocument.createElement('div');
       wrapper.className = 'table-responsive';
       table.parentNode.insertBefore(wrapper, table);
       wrapper.appendChild(table);
@@ -372,7 +453,9 @@ export class MarkdownRenderer {
     // 0-2) 이미지 요소에 자동 반응형 센터링 및 고화질 렌더링 클래스 부여
     containerElement.querySelectorAll('img:not(.rendered-diagram-img)').forEach((img) => {
       img.classList.add('rendered-diagram-img');
-      img.loading = 'lazy';
+      // 문서 전체 높이와 판서 좌표를 안정적으로 계산하려면 화면 밖 이미지도 즉시 요청해야 합니다.
+      img.loading = 'eager';
+      img.decoding = 'async';
     });
 
     // 0-3) 링크 요소 후처리 (외부 링크, HTML 인터랙티브 뷰어, 내부 마크다운 문서 링크 분기)
@@ -394,7 +477,12 @@ export class MarkdownRenderer {
       // 2. 내부 마크다운 문서 링크 (.md, .markdown) -> 프레젠테이션 미러 내비게이션으로 연결
       const mdMatch = rawHref.match(/^(.*?\.md|.*?\.markdown)(?:([?#].*))?$/i);
       if (mdMatch) {
-        let cleanPath = decodeURIComponent(mdMatch[1]).trim();
+        let cleanPath = mdMatch[1].trim();
+        try {
+          cleanPath = decodeURIComponent(cleanPath);
+        } catch (error) {
+          console.warn('잘못 인코딩된 문서 링크를 원문 그대로 사용합니다:', cleanPath);
+        }
         const resolvedDocPath = this.combinePaths(docDir, cleanPath);
         a.setAttribute('data-target-doc', resolvedDocPath);
         a.classList.add('doc-nav-link');
@@ -404,18 +492,22 @@ export class MarkdownRenderer {
     });
 
     // 1) Highlight.js 구문 강조 및 복사 버튼 부착
-    if (typeof hljs !== 'undefined') {
+    if (this.hljs) {
       containerElement.querySelectorAll('pre code:not(.language-mermaid)').forEach((block) => {
-        // 이미 하이라이트된 블록인지 확인
-        if (!block.classList.contains('hljs')) {
-          hljs.highlightElement(block);
+        try {
+          // 이미 하이라이트된 블록인지 확인
+          if (!block.classList.contains('hljs')) {
+            this.hljs.highlightElement(block);
+          }
+        } catch (error) {
+          console.warn('코드 문법 강조를 건너뜁니다:', error);
         }
 
         // 코드 복사 버튼 래퍼 생성
         const pre = block.parentElement;
         if (!pre.querySelector('.code-copy-btn')) {
           pre.style.position = 'relative';
-          const copyBtn = document.createElement('button');
+          const copyBtn = ownerDocument.createElement('button');
           copyBtn.className = 'btn-icon code-copy-btn';
           copyBtn.innerHTML = '<i class="fas fa-copy"></i> 복사';
           copyBtn.style.position = 'absolute';
@@ -441,20 +533,19 @@ export class MarkdownRenderer {
     }
 
     // 2) Mermaid.js 다이어그램 렌더링 (사전 검증 + 타임아웃 보호 + 전역 상태 오염 원천 차단)
-    if (typeof mermaid !== 'undefined') {
+    if (this.mermaid) {
       const mermaidBlocks = Array.from(
         containerElement.querySelectorAll('pre code.language-mermaid')
       );
       for (const codeEl of mermaidBlocks) {
-        if (!containerElement.isConnected) break; // 새 문서 로드로 이전 컨테이너가 분리되었으면 즉시 중단
+        if (!shouldContinue()) break;
 
         const originalMermaid = codeEl.innerText;
         const legendContext = codeEl.parentElement?.nextElementSibling?.textContent || '';
-        const mermaidSource = normalizeMermaidSource(originalMermaid, legendContext);
-        
+
         // 고유 타임스탬프 + 시퀀스 번호로 ID 충돌 원천 차단
         const uniqueRenderId = `mermaid-${Date.now()}-${++this.mermaidRenderSequence}`;
-        const containerDiv = document.createElement('div');
+        const containerDiv = ownerDocument.createElement('div');
         containerDiv.className = 'mermaid-chart';
         containerDiv.id = uniqueRenderId;
 
@@ -467,19 +558,33 @@ export class MarkdownRenderer {
 
         let rendered = false;
         try {
-          // [1차 방어선] 사전 구문 검증: 실패 시 render를 아예 호출하지 않아 Mermaid 싱글톤 런타임 보호
-          if (typeof mermaid.parse === 'function') {
-            await mermaid.parse(mermaidSource, { suppressErrors: true });
+          // 1단계: 정규화 자체가 실패해도 이 다이어그램만 원문으로 되돌립니다.
+          const mermaidSource = normalizeMermaidSource(originalMermaid, legendContext);
+
+          // 2단계: 사전 구문 검증이 false를 반환하면 render를 호출하지 않습니다.
+          if (typeof this.mermaid.parse === 'function') {
+            const isValid = await this.runMermaidOperation(
+              () => this.mermaid.parse(mermaidSource, { suppressErrors: true }),
+              {
+                signal,
+                timeoutMs: MERMAID_PARSE_TIMEOUT_MS,
+                label: '구문 검사'
+              }
+            );
+            if (isValid === false) throw new Error('Mermaid 구문이 올바르지 않습니다.');
           }
+          if (!shouldContinue()) throw createAbortError();
 
-          // [2차 방어선] 2초 타임아웃 레이스: 렌더링 지연으로 인한 UI 프리징 방지
-          const renderPromise = mermaid.render(`${uniqueRenderId}-svg`, mermaidSource);
-          const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Mermaid render timeout (2000ms)')), 2000)
+          // 3단계: 렌더링도 제한 시간 안에서 한 건씩만 실행합니다.
+          const { svg } = await this.runMermaidOperation(
+            () => this.mermaid.render(`${uniqueRenderId}-svg`, mermaidSource),
+            {
+              signal,
+              timeoutMs: MERMAID_RENDER_TIMEOUT_MS,
+              label: '렌더링'
+            }
           );
-
-          const { svg } = await Promise.race([renderPromise, timeoutPromise]);
-          if (containerDiv.isConnected) {
+          if (shouldContinue() && containerDiv.isConnected) {
             containerDiv.innerHTML = svg;
             fitMermaidSvg(containerDiv.querySelector('svg'));
             rendered = true;
@@ -487,12 +592,11 @@ export class MarkdownRenderer {
         } catch (err) {
           console.warn(`[Presentation Mirror] Mermaid 렌더링 보호 조치 발동 (${uniqueRenderId}):`, err?.message || err);
           
-          // [3차 방어선] document.body에 잔류하는 임시 노드 완전 청소 및 파서 리셋
+          // Mermaid가 만든 임시 노드만 치웁니다. 진행 중인 전역 파서를 재초기화하지 않습니다.
           try {
-            document.querySelectorAll(`[id*="${uniqueRenderId}"]`).forEach(el => {
+            ownerDocument.querySelectorAll(`[id*="${uniqueRenderId}"]`).forEach(el => {
               if (el !== containerDiv && !containerDiv.contains(el)) el.remove();
             });
-            this.initMermaid();
           } catch (cleanErr) {
             // safe cleanup pass
           }
@@ -500,12 +604,14 @@ export class MarkdownRenderer {
 
         if (!rendered && containerDiv.isConnected) {
           containerDiv.classList.add('mermaid-error');
-          const fallbackPre = document.createElement('pre');
-          const fallbackCode = document.createElement('code');
+          const fallbackPre = ownerDocument.createElement('pre');
+          const fallbackCode = ownerDocument.createElement('code');
           fallbackCode.textContent = originalMermaid;
           fallbackPre.appendChild(fallbackCode);
           containerDiv.replaceChildren(fallbackPre);
         }
+
+        if (!shouldContinue()) break;
       }
     }
   }

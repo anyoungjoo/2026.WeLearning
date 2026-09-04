@@ -5,6 +5,8 @@ import fs from 'node:fs';
 import {
   expandMermaidViewBox,
   fitMermaidSvg,
+  MarkdownRenderer,
+  normalizeEdgeLabels,
   normalizeMermaidSource
 } from '../public/js/markdownRenderer.js';
 
@@ -98,6 +100,54 @@ test('normalizeMermaidSource automatically quotes unquoted edge labels containin
   assert.match(normalized, /Step1 -->\|"1차: 기계 번역<br\/>\(한국어-KSL 병렬 코퍼스 극도 부족\)"\| Step2/);
 });
 
+test('edge label normalization does not change a pipe character inside a node label', () => {
+  const source = `flowchart LR
+    A["입력 | 계산 | 출력"] --> B["결과"]`;
+
+  assert.equal(normalizeEdgeLabels(source), source);
+});
+
+test('Mermaid source removes excessive trailing whitespace before checking its size', () => {
+  const normalized = normalizeMermaidSource(`flowchart LR\n  A --> B${' '.repeat(49000)}`);
+
+  assert.equal(normalized, 'flowchart LR\n  A --> B');
+  assert.throws(
+    () => normalizeMermaidSource(`flowchart LR\n  A["${'가'.repeat(20001)}"]`),
+    /허용 크기/
+  );
+});
+
+test('a timed-out Mermaid operation prevents a second operation from joining its queue', async () => {
+  const renderer = new MarkdownRenderer({
+    markedLibrary: null,
+    highlightLibrary: null,
+    mermaidLibrary: null
+  });
+  let releaseOperation;
+  const slowOperation = new Promise(resolve => {
+    releaseOperation = resolve;
+  });
+
+  await assert.rejects(
+    renderer.runMermaidOperation(() => slowOperation, {
+      timeoutMs: 5,
+      label: '테스트'
+    }),
+    /제한 시간 초과/
+  );
+  await assert.rejects(
+    renderer.runMermaidOperation(() => Promise.resolve(true), {
+      timeoutMs: 5,
+      label: '두 번째 테스트'
+    }),
+    /아직 끝나지 않았습니다/
+  );
+
+  releaseOperation(true);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(renderer.activeMermaidOperation, null);
+});
+
 test('Highlight.js processing skips Mermaid code blocks and supports jsonc alias', () => {
   const rendererSource = fs.readFileSync(
     new URL('../public/js/markdownRenderer.js', import.meta.url),
@@ -105,13 +155,16 @@ test('Highlight.js processing skips Mermaid code blocks and supports jsonc alias
   );
 
   assert.match(rendererSource, /pre code:not\(\.language-mermaid\)/);
-  assert.match(rendererSource, /hljs\.registerAliases\('jsonc',\s*\{\s*languageName:\s*'json'\s*\}\)/);
+  assert.match(rendererSource, /this\.hljs\.registerAliases\('jsonc',\s*\{\s*languageName:\s*'json'\s*\}\)/);
 });
 
-test('the viewer loads a Mermaid version that supports radar-beta', () => {
+test('the viewer loads render libraries from local vendor routes before the app module', () => {
   const indexHtml = fs.readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 
-  assert.match(indexHtml, /mermaid@11\.16\.1\/dist\/mermaid\.min\.js/);
+  assert.match(indexHtml, /src="\/vendor\/marked\.min\.js"/);
+  assert.match(indexHtml, /src="\/vendor\/mermaid\.min\.js"/);
+  assert.doesNotMatch(indexHtml, /<(?:script|link)[^>]+(?:src|href)=["']https?:\/\//i);
+  assert.ok(indexHtml.indexOf('/vendor/mermaid.min.js') < indexHtml.indexOf('/js/app.js'));
   assert.match(indexHtml, /<link rel="icon"/);
 });
 
