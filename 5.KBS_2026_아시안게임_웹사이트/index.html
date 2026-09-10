@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="KBS 2026 아이치-나고야 아시안게임 공식 방송사 특별 포털 - 실시간 경기 생중계, 주요 경기일정, 하이라이트 영상, 메달 종합 순위">
+  <title>2026 아이치-나고야 아시안게임 | KBS</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/asian-games.css">
+  <link rel="stylesheet" href="css/schedule.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       SITE HEADER
+       ========================================================================== -->
+  <header class="site-header">
+    <!-- 1. Top Utility Navigation Bar -->
+    <div class="top-utility-bar">
+      <div class="container top-utility-container">
+        <nav class="utility-nav" aria-label="KBS 유틸리티 메뉴">
+          <a href="#about">About KBS</a>
+          <span class="utility-divider"></span>
+          <a href="#viewer">시청자센터</a>
+          <span class="utility-divider"></span>
+          <a href="#press">보도자료</a>
+          <span class="utility-divider"></span>
+          <a href="#sabo">KBS사보</a>
+          <span class="utility-divider"></span>
+          <a href="#event">이벤트·방청</a>
+          <span class="utility-divider"></span>
+          <a href="#korean">우리말 바로 알기</a>
+          <span class="utility-divider"></span>
+          <a href="#join">회원가입</a>
+          <span class="utility-divider"></span>
+          <a href="#login">로그인</a>
+          <span class="utility-divider"></span>
+          <a href="#program">프로그램</a>
+          <span class="utility-divider"></span>
+          <a href="#schedule">편성표</a>
+          <span class="utility-divider"></span>
+          <button class="lang-dropdown-btn" type="button" aria-label="언어 선택">
+            <span>Language</span>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
+              <path d="M1 1L5 5L9 1" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- 2. Main Brand & Action Bar -->
+    <div class="main-brand-bar">
+      <div class="container brand-container">
+        <div class="brand-logos">
+          <!-- KBS Official Logo -->
+          <a href="/" class="kbs-logo-link" aria-label="KBS 홈 바로가기">
+            <svg class="kbs-symbol-svg" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- KBS Logo Graphic Text & Eye Emblem -->
+              <text x="0" y="70" font-family="'Pretendard', sans-serif" font-weight="900" font-size="64" fill="#004b9c" letter-spacing="-2">KBS</text>
+            </svg>
+            <svg width="44" height="44" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Iconic KBS Globe/Eye Motif -->
+              <circle cx="50" cy="50" r="42" stroke="#004b9c" stroke-width="8"/>
+              <ellipse cx="50" cy="50" rx="34" ry="16" fill="#004b9c" transform="rotate(-25 50 50)"/>
+              <ellipse cx="50" cy="50" rx="14" ry="7" fill="#ffffff" transform="rotate(-25 50 50)"/>
+            </svg>
+          </a>
+
+          <div class="logo-separator"></div>
+
+          <!-- 2026 Aichi-Nagoya Asian Games Official Broadcaster Emblem -->
+          <div class="ag-partner-badge">
+            <svg class="ag-logo-mark" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Dynamic Asian Games flame / ribbon mark -->
+              <path d="M18 48C12 36 14 18 30 10C34 16 32 24 28 28C24 32 24 38 28 44C25 46 21 47 18 48Z" fill="#7928ca"/>
+              <path d="M30 10C42 16 46 32 38 46C34 40 34 32 37 26C39 20 37 14 30 10Z" fill="#e11d48"/>
+              <circle cx="33" cy="28" r="5" fill="#f59e0b"/>
+            </svg>
+            <div class="ag-badge-text">
+              <span class="ag-badge-title">KBS</span>
+              <span class="ag-badge-sub">OFFICIAL BROADCASTER</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Header Right Tools (Profile & Search) -->
+        <div class="header-action-tools">
+          <button class="icon-btn" id="userProfileBtn" type="button" aria-label="마이페이지 / 로그인">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </button>
+          <button class="icon-btn" id="headerSearchBtn" type="button" aria-label="통합검색 열기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Overlay Box (Toggled on search icon click) -->
+    <div class="search-overlay" id="searchOverlay">
+      <div class="container">
+        <form class="search-box-wrapper" onsubmit="event.preventDefault();">
+          <input type="text" id="searchInput" class="search-input" placeholder="아시안게임 경기 종목, 출전 선수, 하이라이트를 검색해보세요" autocomplete="off">
+          <button type="submit" class="search-submit-btn" aria-label="검색 실행">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+          <button type="button" class="search-close-btn" id="searchCloseBtn" aria-label="검색창 닫기">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </form>
+        <div class="search-tags">
+          <span>인기 검색어:</span>
+          <span class="tag-badge" onclick="openCardVideo('fencing')">#사브르어펜져스</span>
+          <span class="tag-badge" onclick="openCardVideo('swimming')">#황선우김우민</span>
+          <span class="tag-badge" onclick="openCardVideo('baseball')">#야구한일전</span>
+          <span class="tag-badge" onclick="openCardVideo('archery')">#양궁결승</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Global Navigation Bar (GNB) -->
+    <div class="gnb-bar">
+      <div class="container gnb-container">
+        <div class="gnb-left">
+          <button class="all-menu-btn" type="button" aria-label="전체메뉴">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          <nav class="gnb-primary-nav" aria-label="주요 서비스 카테고리">
+            <a href="#news" class="gnb-link">뉴스</a>
+            <a href="#drama" class="gnb-link">드라마</a>
+            <a href="#entertainment" class="gnb-link">예능</a>
+            <!-- Active Highlighted Tab from screenshot -->
+            <a href="#asian-games" class="gnb-link active-highlight">아이치-나고야 아시안게임</a>
+            <a href="#culture" class="gnb-link">시사교양</a>
+            <a href="#radio" class="gnb-link">라디오</a>
+          </nav>
+        </div>
+
+        <div class="gnb-right-nav">
+          <a href="#luxury" class="sub-link">명품관</a>
+          <a href="#music" class="sub-link">뮤직</a>
+          <a href="#star" class="sub-link">스타연예</a>
+          <a href="#local" class="sub-link">지역국</a>
+          <a href="#world" class="sub-link">KBS WORLD</a>
+          <a href="#sea" class="sub-link">바다</a>
+          <a href="#replay" class="sub-link">다시보기</a>
+          <!-- ON AIR button with live pulsing red dot -->
+          <a href="#onair" class="on-air-pill" id="onAirQuickBtn" title="KBS 실시간 생중계 보기">
+            <span class="pulse-dot"></span>
+            <span>ON AIR</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       HERO FEATURE BANNER: 2026 AICHI-NAGOYA ASIAN GAMES
+       ========================================================================== -->
+  <main>
+    <section class="ag-hero-section" id="asian-games">
+      <div class="container">
+        <!-- Top row: Title, Dates, and Medal Standings Widget -->
+        <div class="ag-hero-top">
+          <div class="ag-title-group">
+            <h1 class="ag-main-title">2026 아이치-나고야 아시안게임</h1>
+            <span class="ag-event-dates">2026. 9. 19.(토)~10. 4.(일)</span>
+          </div>
+
+          <!-- Hanging Ribbon & Korea Medal Standings Widget -->
+          <div class="ag-medal-widget" role="button" tabindex="0" onclick="openMedalModal()" aria-label="대한민국 실시간 메달 순위 확인">
+            <!-- Decorative hanging ribbons matching screenshot -->
+            <div class="hanging-ribbons-container" aria-hidden="true">
+              <div class="hanging-ribbon gold-ribbon">
+                <span class="ribbon-mini-badge">KOR</span>
+              </div>
+              <div class="hanging-ribbon silver-ribbon">
+                <span class="ribbon-mini-badge">KOR</span>
+              </div>
+              <div class="hanging-ribbon bronze-ribbon">
+                <span class="ribbon-mini-badge">KOR</span>
+              </div>
+            </div>
+
+            <div class="medal-rank-label">
+              <span>대한민국 현재 - 위</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+
+            <div class="medal-badges-row">
+              <div class="medal-badge gold" id="goldCount" title="금메달 0개">0</div>
+              <div class="medal-badge silver" id="silverCount" title="은메달 0개">0</div>
+              <div class="medal-badge bronze" id="bronzeCount" title="동메달 0개">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Asian Games Video Highlights Carousel -->
+        <div class="ag-carousel-wrapper" aria-label="아시안게임 주요 영상 캐러셀">
+          <button class="carousel-arrow prev" type="button" aria-label="이전 영상 보기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <div class="carousel-viewport">
+            <div class="carousel-track">
+              <!-- Card 1: Fencing (남자 사브르 단체 어펜져스 어셈블) -->
+              <article class="ag-video-card" onclick="openCardVideo('fencing')">
+                <div class="card-img-wrapper">
+                  <img src="assets/images/fencing.jpg" alt="남자 사브르 단체 어펜져스 어셈블 경기 하이라이트" class="card-thumbnail" loading="eager">
+                  <div class="card-gradient-overlay"></div>
+
+                  <div class="card-top-badges">
+                    <span class="badge-replay">🎬 RE:PLAY ASIA</span>
+                    <span class="badge-all-sports">올스</span>
+                  </div>
+
+                  <div class="card-play-overlay">
+                    <div class="play-circle-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div class="card-content-bottom">
+                    <span class="event-subtitle-pill">남자 사브르 단체</span>
+                    <h2 class="card-main-title">어펜져스 어셈블</h2>
+                  </div>
+
+                  <span class="card-duration-badge">04:15</span>
+                </div>
+              </article>
+
+              <!-- Card 2: Swimming (한국 수영 모먼트 다 모았다!) -->
+              <article class="ag-video-card" onclick="openCardVideo('swimming')">
+                <div class="card-img-wrapper">
+                  <img src="assets/images/swimming.jpg" alt="한국 수영 모먼트 다 모았다 하이라이트" class="card-thumbnail" loading="eager">
+                  <div class="card-gradient-overlay"></div>
+
+                  <div class="card-top-badges">
+                    <span class="badge-replay">🎬 RE:PLAY ASIA</span>
+                    <span class="badge-all-sports">올스</span>
+                  </div>
+
+                  <div class="card-play-overlay">
+                    <div class="play-circle-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div class="card-content-bottom">
+                    <span class="event-subtitle-pill cyan">한국 수영 모먼트</span>
+                    <h2 class="card-main-title">다 모았다!</h2>
+                  </div>
+
+                  <span class="card-duration-badge">03:42</span>
+                </div>
+              </article>
+
+              <!-- Card 3: Baseball (2026 아시안게임 야구 키플레이어는?!) -->
+              <article class="ag-video-card" onclick="openCardVideo('baseball')">
+                <div class="card-img-wrapper">
+                  <img src="assets/images/baseball.jpg" alt="2026 아시안게임 야구 키플레이어 프리뷰" class="card-thumbnail" loading="eager">
+                  <div class="card-gradient-overlay"></div>
+
+                  <div class="card-top-badges">
+                    <span class="badge-replay" style="background: rgba(0,75,156,0.8); padding: 2px 6px; border-radius: 4px;">KBS 2026 아시안게임</span>
+                    <span class="badge-all-sports">올스</span>
+                  </div>
+
+                  <div class="card-play-overlay">
+                    <div class="play-circle-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div class="card-content-bottom">
+                    <span class="event-subtitle-pill gold">2026 아시안게임</span>
+                    <h2 class="card-main-title">야구 키플레이어는?!</h2>
+                  </div>
+
+                  <span class="card-duration-badge">05:10</span>
+                </div>
+              </article>
+
+              <!-- Card 4: Archery (신궁의 집중력! 여자 양궁 단체전) -->
+              <article class="ag-video-card" onclick="openCardVideo('archery')">
+                <div class="card-img-wrapper">
+                  <img src="assets/images/archery.jpg" alt="여자 양궁 단체전 결승 하이라이트" class="card-thumbnail" loading="lazy">
+                  <div class="card-gradient-overlay"></div>
+
+                  <div class="card-top-badges">
+                    <span class="badge-replay">🎬 RE:PLAY ASIA</span>
+                    <span class="badge-all-sports">올스</span>
+                  </div>
+
+                  <div class="card-play-overlay">
+                    <div class="play-circle-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div class="card-content-bottom">
+                    <span class="event-subtitle-pill">여자 양궁 리커브</span>
+                    <h2 class="card-main-title">신궁 10점 릴레이</h2>
+                  </div>
+
+                  <span class="card-duration-badge">06:12</span>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <button class="carousel-arrow next" type="button" aria-label="다음 영상 보기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCHEDULE SECTION: 주요 경기일정
+         ========================================================================== -->
+    <section class="ag-schedule-section" id="schedule-section">
+      <div class="container">
+        <!-- Schedule Title Header -->
+        <div class="schedule-header-row">
+          <div class="schedule-title-wrapper">
+            <h2 class="schedule-main-heading">주요 경기일정</h2>
+            <span class="schedule-current-date">9. 10.(목)</span>
+          </div>
+
+          <button class="schedule-view-all-btn" type="button" onclick="openScheduleModal()">
+            전체 일정 보기
+          </button>
+        </div>
+
+        <!-- Date Tabs Navigation -->
+        <div class="date-tabs-container">
+          <button class="date-tab" type="button" data-date="9-9">
+            <span class="date-label">9. 9.(수)</span>
+          </button>
+          <button class="date-tab active" type="button" data-date="9-10">
+            <span class="today-tag">TODAY</span>
+            <span class="date-label">9. 10.(목)</span>
+          </button>
+          <button class="date-tab" type="button" data-date="9-11">
+            <span class="date-label">9. 11.(금)</span>
+          </button>
+          <button class="date-tab" type="button" data-date="9-12">
+            <span class="date-label">9. 12.(토)</span>
+          </button>
+          <button class="date-tab" type="button" data-date="9-13">
+            <span class="date-label">9. 13.(일)</span>
+          </button>
+        </div>
+
+        <!-- Filter Chips -->
+        <div class="schedule-filter-bar">
+          <button class="filter-chip active" type="button" data-filter="all">전체 경기</button>
+          <button class="filter-chip" type="button" data-filter="korea">대한민국 경기만</button>
+          <button class="filter-chip" type="button" data-filter="live">🔴 생중계(LIVE)</button>
+          <button class="filter-chip" type="button" data-filter="final">🏆 메달 결정전</button>
+        </div>
+
+        <!-- Match Cards Dynamic Grid -->
+        <div class="matches-grid" id="matchesContainer">
+          <!-- Rendered via js/schedule.js -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       MODAL: SIMULATED VIDEO PLAYER (KBS SPORTS LIVE STREAM)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="videoPlayerModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span class="pulse-dot" style="background:#ef4444;"></span>
+          <span class="modal-video-title">[KBS 2026 아시안게임] 현장 라이브</span>
+        </h3>
+        <button class="modal-close-btn" type="button" aria-label="플레이어 닫기">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="video-player-container">
+          <img src="assets/images/fencing.jpg" alt="영상 미리보기" class="player-simulated-screen">
+          <div class="player-controls-bar">
+            <div class="player-timeline">
+              <div class="player-timeline-progress"></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px; font-size: 13px;">
+              <span style="cursor: pointer;">▶ / ❚❚</span>
+              <span>1080p FHD · 현장음</span>
+            </div>
+            <div style="font-size: 12px; color: #cbd5e1;">
+              KBS LIVE STREAMING
+            </div>
+          </div>
+        </div>
+        <p class="modal-video-desc" style="color: #bbb; font-size: 14px; line-height: 1.6;">
+          대한민국 국가대표팀의 뜨거운 승부의 순간을 KBS 1TV / 2TV / my K를 통해 만나보세요.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: MEDAL STANDINGS (실시간 메달 종합 순위)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="medalModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">🏅 2026 아이치-나고야 아시안게임 실시간 메달 순위</h3>
+        <button class="modal-close-btn" type="button" aria-label="메달 순위 닫기">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table class="medal-table">
+          <thead>
+            <tr>
+              <th>순위</th>
+              <th style="text-align: left; padding-left: 16px;">국가 / 지역</th>
+              <th class="medal-col-gold">금(Gold)</th>
+              <th class="medal-col-silver">은(Silver)</th>
+              <th class="medal-col-bronze">동(Bronze)</th>
+              <th>합계</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td style="text-align: left; padding-left: 16px;">🇨🇳 중국</td>
+              <td class="medal-col-gold">34</td>
+              <td class="medal-col-silver">22</td>
+              <td class="medal-col-bronze">16</td>
+              <td><strong>72</strong></td>
+            </tr>
+            <tr class="highlight-kor">
+              <td>2</td>
+              <td style="text-align: left; padding-left: 16px;">🇰🇷 대한민국</td>
+              <td class="medal-col-gold">22</td>
+              <td class="medal-col-silver">18</td>
+              <td class="medal-col-bronze">20</td>
+              <td><strong>60</strong></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td style="text-align: left; padding-left: 16px;">🇯🇵 일본 (개최국)</td>
+              <td class="medal-col-gold">19</td>
+              <td class="medal-col-silver">21</td>
+              <td class="medal-col-bronze">24</td>
+              <td><strong>64</strong></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td style="text-align: left; padding-left: 16px;">🇺🇿 우즈베키스탄</td>
+              <td class="medal-col-gold">8</td>
+              <td class="medal-col-silver">9</td>
+              <td class="medal-col-bronze">12</td>
+              <td><strong>29</strong></td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td style="text-align: left; padding-left: 16px;">🇹🇼 대만</td>
+              <td class="medal-col-gold">6</td>
+              <td class="medal-col-silver">7</td>
+              <td class="medal-col-bronze">9</td>
+              <td><strong>22</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: FULL SCHEDULE (전체 일정 보기)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="fullScheduleModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">📅 2026 아이치-나고야 아시안게임 전체 경기 일정</h3>
+        <button class="modal-close-btn" type="button" aria-label="일정표 닫기">&times;</button>
+      </div>
+      <div class="modal-body" style="line-height: 1.8; color: #ccc; font-size: 14px;">
+        <p style="margin-bottom: 14px; color: #eee; font-weight: 600;">총 42개 종목, 482개 세부 경기가 16일간 펼쳐집니다.</p>
+        <ul style="list-style: disc; padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+          <li><strong>9. 19.(토)</strong> : 개회식 (나고야 돔 주경기장) · KBS 1TV 생중계</li>
+          <li><strong>9. 20.(일) ~ 9. 26.(토)</strong> : 수영, 펜싱, 유도, 사격, 태권도 결승 집중 주간</li>
+          <li><strong>9. 27.(일) ~ 10. 3.(토)</strong> : 양궁, 배드민턴, 야구, 축구, 농구 메달 결정전</li>
+          <li><strong>10. 4.(일)</strong> : 마라톤 결승 및 폐회식 · KBS 1TV 생중계</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       FOOTER
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top-links">
+        <a href="#broadcast">방송강령</a>
+        <a href="#privacy"><strong>개인정보처리방침</strong></a>
+        <a href="#terms">이용약관</a>
+        <a href="#youth">청소년보호정책</a>
+        <a href="#ad">광고안내</a>
+        <a href="#viewer">시청자상담실</a>
+        <a href="#map">오시는 길</a>
+        <a href="#recruit">인재채용</a>
+      </div>
+
+      <div class="footer-info">
+        <p>한국방송공사 (07235) 서울특별시 영등포구 여의공원로 13 (여의도동) | 대표전화: 02-781-1000</p>
+        <p>사업자등록번호: 107-82-00045 | 통신판매업신고번호: 제2004-서울영등포-0008호 | 대표자: 박민</p>
+      </div>
+
+      <div class="footer-bottom">
+        <span class="copyright">Copyright ⓒ 2026 KBS. All rights reserved. 본 콘텐츠의 저작권은 한국방송공사에 있습니다.</span>
+        <div class="footer-dropdown">
+          <select aria-label="패밀리 사이트 선택">
+            <option>KBS 패밀리 사이트</option>
+            <option>KBS my K</option>
+            <option>KBS WORLD TV</option>
+            <option>KBS 교향악단</option>
+            <option>KBS 미디어</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/carousel.js"></script>
+  <script src="js/schedule.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,451 @@
+/* ==========================================================================
+   2026 AICHI-NAGOYA ASIAN GAMES HERO BANNER & CAROUSEL STYLES
+   ========================================================================== */
+
+.ag-hero-section {
+  position: relative;
+  background: linear-gradient(135deg, #2b0c4a 0%, #461474 35%, #591a92 65%, #300d52 100%);
+  color: #fff;
+  padding: 36px 0 54px;
+  overflow: hidden;
+  box-shadow: inset 0 -12px 30px rgba(0,0,0,0.3);
+}
+
+/* Stylized Geometric Watermark Pattern (matching screenshot background) */
+.ag-hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.22) 0%, transparent 40%),
+    radial-gradient(circle at 85% 60%, rgba(168, 85, 247, 0.28) 0%, transparent 45%),
+    linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.02) 50%, transparent 52%),
+    linear-gradient(-45deg, transparent 48%, rgba(255,255,255,0.02) 50%, transparent 52%);
+  background-size: 100% 100%, 100% 100%, 60px 60px, 60px 60px;
+  pointer-events: none;
+}
+
+/* Hero Top Bar: Title, Date, and Medal Standings */
+.ag-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 2;
+}
+
+.ag-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ag-main-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.ag-event-dates {
+  font-size: 17px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: -0.3px;
+}
+
+/* Medal Standings Widget (Top Right) */
+.ag-medal-widget {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 10px;
+}
+
+/* Hanging ribbons effect */
+.hanging-ribbons-container {
+  position: absolute;
+  top: -46px;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.hanging-ribbon {
+  width: 22px;
+  height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+}
+
+.hanging-ribbon::before {
+  content: '';
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 50%, #1d4ed8 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+}
+
+.hanging-ribbon.gold-ribbon::before {
+  background: linear-gradient(180deg, #3730a3 0%, #4338ca 60%, #eab308 100%);
+}
+
+.hanging-ribbon.silver-ribbon::before {
+  background: linear-gradient(180deg, #065f46 0%, #059669 60%, #94a3b8 100%);
+}
+
+.hanging-ribbon.bronze-ribbon::before {
+  background: linear-gradient(180deg, #581c87 0%, #7e22ce 60%, #d97706 100%);
+}
+
+.ribbon-mini-badge {
+  font-size: 7px;
+  color: #fff;
+  position: absolute;
+  top: 8px;
+  font-weight: 700;
+  transform: scale(0.85);
+}
+
+.medal-rank-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.medal-rank-label:hover {
+  opacity: 0.85;
+}
+
+.medal-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.medal-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 800;
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.medal-badge:hover {
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.45);
+}
+
+.medal-badge.gold {
+  background: linear-gradient(135deg, #fef08a 0%, #eab308 50%, #ca8a04 100%);
+  color: #583c00;
+  border: 1.5px solid #fef9c3;
+}
+
+.medal-badge.silver {
+  background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 50%, #94a3b8 100%);
+  color: #334155;
+  border: 1.5px solid #ffffff;
+}
+
+.medal-badge.bronze {
+  background: linear-gradient(135deg, #fed7aa 0%, #f97316 50%, #c2410c 100%);
+  color: #5a2003;
+  border: 1.5px solid #ffedd5;
+}
+
+/* ==========================================================================
+   CAROUSEL SLIDER & VIDEO CARDS
+   ========================================================================== */
+.ag-carousel-wrapper {
+  position: relative;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.carousel-viewport {
+  overflow: hidden;
+  width: 100%;
+  border-radius: var(--radius-md);
+  padding: 8px 0;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 20px;
+  transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
+}
+
+/* Individual Video Card (matching the 3 cards in screenshot) */
+.ag-video-card {
+  flex: 0 0 calc((100% - 40px) / 3);
+  min-width: calc((100% - 40px) / 3);
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  aspect-ratio: 16 / 9.6;
+  background-color: #1a082c;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.ag-video-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.4);
+}
+
+.card-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.card-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ag-video-card:hover .card-thumbnail {
+  transform: scale(1.08);
+}
+
+/* Dark gradient overlay for readable broadcast text */
+.card-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg, 
+    rgba(0, 0, 0, 0.5) 0%, 
+    rgba(0, 0, 0, 0.1) 35%, 
+    rgba(0, 0, 0, 0.4) 65%, 
+    rgba(14, 5, 24, 0.95) 100%
+  );
+  pointer-events: none;
+}
+
+/* Top Badges (🎬 RE:PLAY ASIA, 올스) */
+.card-top-badges {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.badge-replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+
+.badge-all-sports {
+  font-size: 12px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.5px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  font-style: italic;
+}
+
+/* Center Play Icon Hover Effect */
+.card-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  background: rgba(43, 12, 74, 0.4);
+  transition: opacity 0.25s ease;
+  z-index: 4;
+}
+
+.ag-video-card:hover .card-play-overlay {
+  opacity: 1;
+}
+
+.play-circle-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #3b0764;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  transform: scale(0.85);
+  transition: transform 0.2s ease, background-color 0.2s;
+}
+
+.ag-video-card:hover .play-circle-icon {
+  transform: scale(1);
+}
+
+.play-circle-icon svg {
+  width: 26px;
+  height: 26px;
+  margin-left: 3px;
+}
+
+/* Bottom Caption / Broadcast Title Overlay */
+.card-content-bottom {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.event-subtitle-pill {
+  display: inline-block;
+  align-self: center;
+  padding: 3px 9px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #e11d48 0%, #f43f5e 100%);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.event-subtitle-pill.cyan {
+  background: linear-gradient(90deg, #0284c7 0%, #06b6d4 100%);
+}
+
+.event-subtitle-pill.gold {
+  background: linear-gradient(90deg, #d97706 0%, #f59e0b 100%);
+}
+
+.card-main-title {
+  font-size: 21px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.25;
+  letter-spacing: -0.6px;
+  text-shadow: 
+    -1.5px -1.5px 0 #000,  
+     1.5px -1.5px 0 #000,
+    -1.5px  1.5px 0 #000,
+     1.5px  1.5px 0 #000,
+     0 3px 8px rgba(0,0,0,0.8);
+}
+
+.card-duration-badge {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #eee;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  z-index: 5;
+}
+
+/* Carousel Control Arrows */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 64px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  z-index: 10;
+  transition: all var(--transition-fast);
+}
+
+.carousel-arrow:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.carousel-arrow.prev {
+  left: -20px;
+}
+
+.carousel-arrow.next {
+  right: -20px;
+}
+
+.carousel-arrow svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .ag-video-card {
+    flex: 0 0 calc((100% - 20px) / 2);
+    min-width: calc((100% - 20px) / 2);
+  }
+}
+
+@media (max-width: 640px) {
+  .ag-main-title {
+    font-size: 24px;
+  }
+  .ag-hero-top {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .ag-video-card {
+    flex: 0 0 100%;
+    min-width: 100%;
+  }
+  .carousel-arrow.prev {
+    left: 4px;
+  }
+  .carousel-arrow.next {
+    right: 4px;
+  }
+}

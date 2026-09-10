@@ -1,0 +1,504 @@
+/* ==========================================================================
+   SCHEDULE SECTION & INTERACTIVE MODALS STYLES
+   ========================================================================== */
+
+.ag-schedule-section {
+  background-color: var(--sched-bg);
+  color: #fff;
+  padding: 42px 0 60px;
+  position: relative;
+}
+
+/* Schedule Header */
+.schedule-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.schedule-title-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.schedule-main-heading {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  color: #ffffff;
+}
+
+.schedule-current-date {
+  font-size: 21px;
+  font-weight: 600;
+  color: #a5a5b5;
+  letter-spacing: -0.3px;
+}
+
+.schedule-view-all-btn {
+  font-size: 14px;
+  font-weight: 600;
+  color: #b0b0c2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color var(--transition-fast);
+}
+
+.schedule-view-all-btn::before {
+  content: '•';
+  color: #88879b;
+}
+
+.schedule-view-all-btn:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Date Navigator Bar */
+.date-tabs-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 22px;
+  scrollbar-width: thin;
+}
+
+.date-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  background: #1f1d2e;
+  border: 1px solid #2a273f;
+  color: #a2a2b8;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.date-tab:hover {
+  background: #27243b;
+  color: #fff;
+}
+
+.date-tab.active {
+  background: #3c1967;
+  border-color: #6929b0;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(90, 24, 154, 0.4);
+}
+
+.date-tab .today-tag {
+  font-size: 10px;
+  color: #a855f7;
+  font-weight: 700;
+}
+
+.date-tab.active .today-tag {
+  color: #e9d5ff;
+}
+
+/* Category Filter Chips */
+.schedule-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 600;
+  background: #1c1a28;
+  color: #9292a8;
+  border: 1px solid #29273c;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-chip:hover {
+  background: #252336;
+  color: #eee;
+}
+
+.filter-chip.active {
+  background: #a855f7;
+  border-color: #a855f7;
+  color: #fff;
+}
+
+/* Match Grid */
+.matches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+  gap: 16px;
+}
+
+/* Match Card */
+.match-card {
+  background: var(--sched-card-bg);
+  border: 1px solid var(--sched-card-border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.match-card:hover {
+  transform: translateY(-3px);
+  border-color: #4b456d;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.match-card.is-live {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.15);
+}
+
+.card-top-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.sport-name-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: #d1d1e0;
+}
+
+.status-badge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge.live {
+  background: #ef4444;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  animation: pulseLive 2s infinite;
+}
+
+@keyframes pulseLive {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.status-badge.upcoming {
+  background: #37354c;
+  color: #a5a5bc;
+}
+
+.status-badge.finished {
+  background: #252433;
+  color: #7d7d92;
+}
+
+/* Match Versus Info */
+.match-content-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.team-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 42%;
+}
+
+.team-col.right {
+  text-align: right;
+}
+
+.team-flag-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f1f1f5;
+}
+
+.team-col.right .team-flag-name {
+  justify-content: flex-end;
+}
+
+.team-athletes {
+  font-size: 12px;
+  color: #8c8c9e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vs-score-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-display {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #facc15;
+}
+
+.match-time-sub {
+  font-size: 12px;
+  color: #9292a4;
+  margin-top: 2px;
+}
+
+/* Card Footer: Channel info and CTA button */
+.match-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #2b283f;
+  padding-top: 12px;
+  margin-top: 2px;
+}
+
+.broadcast-channel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0ea5e9;
+}
+
+.broadcast-channel.kbs1 {
+  color: #38bdf8;
+}
+
+.broadcast-channel.kbs2 {
+  color: #a78bfa;
+}
+
+.watch-live-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 4px;
+  background: #3b82f6;
+  color: #fff;
+  transition: all var(--transition-fast);
+}
+
+.watch-live-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.watch-live-btn.replay {
+  background: #2a273f;
+  color: #ccc;
+}
+
+.watch-live-btn.replay:hover {
+  background: #363252;
+  color: #fff;
+}
+
+/* ==========================================================================
+   MODAL POPUPS (VIDEO PLAYER, MEDAL TABLE, FULL SCHEDULE)
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 6, 15, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+  padding: 20px;
+}
+
+.modal-backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-dialog {
+  background: #181625;
+  border: 1px solid #2f2d45;
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 880px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.modal-backdrop.is-open .modal-dialog {
+  transform: translateY(0) scale(1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #28263a;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-close-btn {
+  color: #9292a8;
+  font-size: 24px;
+  padding: 4px;
+  transition: color var(--transition-fast);
+}
+
+.modal-close-btn:hover {
+  color: #fff;
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* Video Player in Modal */
+.video-player-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.player-simulated-screen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.player-controls-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.9));
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+}
+
+.player-timeline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  cursor: pointer;
+}
+
+.player-timeline-progress {
+  width: 42%;
+  height: 100%;
+  background: #ef4444;
+}
+
+/* Medal Table Styles */
+.medal-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 14px;
+}
+
+.medal-table th {
+  background: #201e30;
+  color: #aaa9bd;
+  padding: 12px 8px;
+  font-weight: 600;
+  border-bottom: 2px solid #2e2c44;
+}
+
+.medal-table td {
+  padding: 14px 8px;
+  border-bottom: 1px solid #262438;
+  color: #ddd;
+}
+
+.medal-table tr.highlight-kor {
+  background: rgba(74, 21, 117, 0.25);
+  font-weight: 700;
+  color: #fff;
+}
+
+.medal-table tr.highlight-kor td:nth-child(2) {
+  color: #60a5fa;
+}
+
+.medal-col-gold {
+  color: #facc15 !important;
+  font-weight: 700;
+}
+
+.medal-col-silver {
+  color: #e2e8f0 !important;
+  font-weight: 700;
+}
+
+.medal-col-bronze {
+  color: #fb923c !important;
+  font-weight: 700;
+}

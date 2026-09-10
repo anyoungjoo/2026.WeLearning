@@ -1,0 +1,530 @@
+/* ==========================================================================
+   KBS OFFICIAL PORTAL & 2026 AICHI-NAGOYA ASIAN GAMES STYLES
+   ========================================================================== */
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+:root {
+  /* Brand Colors */
+  --kbs-blue: #004b9c;
+  --kbs-blue-dark: #00336d;
+  --kbs-blue-light: #e8f0fe;
+  --kbs-red: #ff3b30;
+  --kbs-dark: #121214;
+  --kbs-gray-900: #1a1a1d;
+  --kbs-gray-800: #2c2c31;
+  --kbs-gray-700: #424248;
+  --kbs-gray-500: #76767e;
+  --kbs-gray-300: #d0d0d5;
+  --kbs-gray-200: #e8e8ed;
+  --kbs-gray-100: #f5f5f7;
+  --kbs-white: #ffffff;
+
+  /* Asian Games 2026 Signature Theme */
+  --ag-purple-deep: #250942;
+  --ag-purple-main: #4a1575;
+  --ag-purple-bright: #7928ca;
+  --ag-purple-light: #a855f7;
+  --ag-purple-glow: rgba(168, 85, 247, 0.35);
+  --ag-gold: #f59e0b;
+  --ag-silver: #cbd5e1;
+  --ag-bronze: #d97706;
+
+  /* Schedule / Dark section */
+  --sched-bg: #15141f;
+  --sched-card-bg: #1f1d2e;
+  --sched-card-border: #2c2a3f;
+  --sched-card-hover: #2a273f;
+
+  /* Dimensions & Transitions */
+  --max-width: 1240px;
+  --header-height: 126px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  --transition-fast: 0.18s ease;
+  --transition-normal: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 6px 20px rgba(0,0,0,0.12);
+  --shadow-lg: 0 12px 36px rgba(0,0,0,0.22);
+  --shadow-purple: 0 8px 30px rgba(74, 21, 117, 0.4);
+}
+
+/* Reset & Base Setup */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  color: #222;
+  background-color: #fff;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ==========================================================================
+   HEADER COMPONENT
+   ========================================================================== */
+.site-header {
+  width: 100%;
+  background: var(--kbs-white);
+  position: relative;
+  z-index: 100;
+  border-bottom: 1px solid var(--kbs-gray-200);
+}
+
+/* 1. Top Utility Navigation Bar */
+.top-utility-bar {
+  border-bottom: 1px solid #f0f0f2;
+  font-size: 12px;
+  color: #666;
+  background-color: #fafafc;
+}
+
+.top-utility-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 34px;
+  gap: 14px;
+}
+
+.utility-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.utility-nav a {
+  color: #666;
+  font-size: 11.5px;
+  letter-spacing: -0.2px;
+}
+
+.utility-nav a:hover {
+  color: var(--kbs-blue);
+}
+
+.utility-divider {
+  width: 1px;
+  height: 10px;
+  background: #ddd;
+}
+
+.lang-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11.5px;
+  color: #555;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.lang-dropdown-btn:hover {
+  background: #edeef2;
+}
+
+/* 2. Main Brand / Logo Area */
+.main-brand-bar {
+  padding: 16px 0;
+}
+
+.brand-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand-logos {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.kbs-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.kbs-symbol-svg {
+  width: 44px;
+  height: 38px;
+}
+
+.kbs-text-svg {
+  height: 28px;
+  fill: #0c4383;
+}
+
+.logo-separator {
+  width: 1px;
+  height: 34px;
+  background-color: #e0e0e4;
+}
+
+.ag-partner-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ag-logo-mark {
+  width: 38px;
+  height: 38px;
+}
+
+.ag-badge-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.ag-badge-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a24;
+  line-height: 1.2;
+}
+
+.ag-badge-sub {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #6a6a78;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.header-action-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #222;
+  transition: all var(--transition-fast);
+}
+
+.icon-btn:hover {
+  background-color: var(--kbs-gray-100);
+  color: var(--kbs-blue);
+  transform: translateY(-1px);
+}
+
+.icon-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* 3. Global Navigation Bar (GNB) */
+.gnb-bar {
+  border-top: 1px solid #f2f2f4;
+  background: var(--kbs-white);
+}
+
+.gnb-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+}
+
+.gnb-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.all-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px 8px 0;
+  font-weight: 600;
+  font-size: 15px;
+  color: #222;
+}
+
+.all-menu-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.gnb-primary-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.gnb-link {
+  font-size: 15.5px;
+  font-weight: 600;
+  color: #262629;
+  padding: 12px 2px;
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.gnb-link:hover {
+  color: var(--kbs-blue);
+}
+
+/* Active Highlight for Asian Games Tab */
+.gnb-link.active-highlight {
+  color: #111;
+  font-weight: 800;
+}
+
+.gnb-link.active-highlight::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #1e1e24;
+  border-radius: 2px 2px 0 0;
+}
+
+.gnb-right-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sub-link {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #4a4a50;
+  white-space: nowrap;
+}
+
+.sub-link:hover {
+  color: var(--kbs-blue);
+}
+
+.on-air-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #111;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #fdf2f2;
+}
+
+.on-air-pill:hover {
+  background: #ffe3e3;
+  color: #d32f2f;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--kbs-red);
+  box-shadow: 0 0 0 rgba(255, 59, 48, 0.4);
+  animation: pulseGlow 1.6s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+@keyframes pulseGlow {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 8px rgba(255, 59, 48, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 59, 48, 0);
+  }
+}
+
+/* ==========================================================================
+   SEARCH OVERLAY POPUP
+   ========================================================================== */
+.search-overlay {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--kbs-white);
+  box-shadow: var(--shadow-lg);
+  border-bottom: 2px solid var(--kbs-blue);
+  padding: 24px 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all var(--transition-normal);
+  z-index: 99;
+}
+
+.search-overlay.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.search-box-wrapper {
+  display: flex;
+  align-items: center;
+  max-width: 680px;
+  margin: 0 auto;
+  border-bottom: 2px solid #222;
+  padding: 6px 4px;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 18px;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 8px 12px;
+}
+
+.search-submit-btn {
+  color: var(--kbs-blue);
+  padding: 6px 12px;
+}
+
+.search-close-btn {
+  color: #777;
+  padding: 6px;
+}
+
+.search-tags {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+  font-size: 13px;
+  color: #666;
+}
+
+.tag-badge {
+  padding: 4px 10px;
+  background: #f1f2f6;
+  border-radius: 14px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.tag-badge:hover {
+  background: #e2e4ec;
+  color: var(--kbs-blue);
+}
+
+/* ==========================================================================
+   FOOTER COMPONENT
+   ========================================================================== */
+.site-footer {
+  background-color: #121217;
+  color: #8c8c9a;
+  padding: 48px 0 36px;
+  border-top: 1px solid #23222e;
+  font-size: 13px;
+}
+
+.footer-top-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #222130;
+  font-size: 13.5px;
+  color: #c0c0d0;
+}
+
+.footer-top-links a:hover {
+  color: var(--kbs-white);
+  text-decoration: underline;
+}
+
+.footer-info {
+  margin-top: 24px;
+  line-height: 1.7;
+}
+
+.footer-info p {
+  margin-bottom: 6px;
+}
+
+.footer-bottom {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.copyright {
+  color: #666575;
+  font-size: 12.5px;
+}
+
+.footer-dropdown select {
+  background-color: #1f1e29;
+  color: #ccc;
+  border: 1px solid #323142;
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
