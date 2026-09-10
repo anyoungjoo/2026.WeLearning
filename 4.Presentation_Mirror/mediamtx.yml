@@ -15,6 +15,11 @@ webrtcAddress: :8889
 webrtcEncryption: no
 webrtcAllowOrigins:
   - '*'
+# 교육장 네트워크에서 UDP가 차단될 때 브라우저가 TCP로 연결할 수 있게 합니다.
+webrtcLocalUDPAddress: :8189
+webrtcLocalTCPAddress: :8189
+webrtcAdditionalHosts:
+  - 10.56.28.166
 
 # Media paths configuration
 paths:
