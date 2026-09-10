@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>KBS 4조 3교대 스마트 근무표 | 일·야·조·비</title>
+  <meta name="description" content="KBS 방송기술 4조 3교대(일·야·조·비) 모바일 & 웹앱 스케줄러">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <!-- ==========================================
+       앱 컨테이너 (모바일 및 데스크톱 반응형 웹앱)
+       ========================================== -->
+  <div class="app-container">
+
+    <!-- 1. 앱 탑바 (App Header) -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="kbs-badge">송출센터</div>
+        <div class="header-titles">
+          <h1 class="app-title">4조 3교대</h1>
+          <span class="cycle-pill">일 · 야 · 조 · 비</span>
+        </div>
+      </div>
+
+      <!-- 상단 툴바 액션 버튼들 -->
+      <div class="header-actions">
+        <button type="button" class="icon-btn" id="exportIcsBtn" title="스마트폰 캘린더 등록 (ICS)" aria-label="캘린더 등록">
+          📅
+        </button>
+        <button type="button" class="icon-btn" id="printBtn" title="근무표 인쇄" aria-label="인쇄">
+          🖨️
+        </button>
+        <button type="button" class="icon-btn" id="openSettingsBtn" title="기준일 설정" aria-label="설정">
+          ⚙️
+        </button>
+        <button type="button" class="icon-btn theme-btn" id="themeToggleBtn" title="다크/라이트 모드" aria-label="테마 변경">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. 내 소속 조 선택기 (Segmented Control) -->
+    <section class="team-segmented-section" aria-label="내 소속 조 선택">
+      <div class="segmented-control" id="myTeamPicker">
+        <button type="button" class="segment-btn active" data-team="1">1조</button>
+        <button type="button" class="segment-btn" data-team="2">2조</button>
+        <button type="button" class="segment-btn" data-team="3">3조</button>
+        <button type="button" class="segment-btn" data-team="4">4조</button>
+      </div>
+    </section>
+
+    <!-- 3. 오늘의 근무 히어로 카드 (Today Hero Card) -->
+    <section class="today-hero-card" aria-label="오늘의 내 근무 현황">
+      <div class="hero-top">
+        <div class="date-live-wrap">
+          <span class="live-indicator"></span>
+          <span class="today-date-text" id="todayFullDate">2026년 9월 10일 (목)</span>
+          <span class="today-time-badge" id="liveClock">14:00:00</span>
+        </div>
+        <div class="next-shift-preview" id="tomorrowShiftPreview">내일: 🌙 야간 (18~24)</div>
+      </div>
+
+      <div class="hero-main">
+        <div class="hero-shift-info">
+          <span class="hero-team-tag" id="heroTeamTag">내 소속: 1조</span>
+          <div class="hero-shift-name" id="heroShiftName">
+            <span class="hero-shift-icon" id="heroShiftIcon">☀️</span>
+            <span id="heroShiftTitle">일근</span>
+          </div>
+          <div class="hero-shift-time" id="heroShiftTime">09:00 ~ 18:00 (9시간 근무)</div>
+        </div>
+
+        <!-- 오늘 4개 조 한눈에 보기 칩들 -->
+        <div class="hero-teams-chips" id="todayTeamsGrid">
+          <!-- JS로 동적 생성 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 캘린더 네비게이션 & 뷰 컨트롤러 -->
+    <section class="view-controller-bar">
+      <!-- 월 이동 네비게이션 -->
+      <div class="month-stepper">
+        <button type="button" class="step-btn" id="prevMonthBtn" aria-label="이전 달">‹</button>
+        <span class="month-title" id="currentMonthDisplay">2026. 09</span>
+        <button type="button" class="step-btn" id="nextMonthBtn" aria-label="다음 달">›</button>
+        <button type="button" class="today-pill-btn" id="todayJumpBtn">오늘</button>
+      </div>
+
+      <!-- 뷰 모드 및 필터 스위치 -->
+      <div class="view-filters">
+        <!-- 내 근무만 보기 토글 -->
+        <button type="button" class="filter-toggle-btn active" id="toggleOnlyMyShiftBtn" title="내 조 근무만 보기 / 전체 조 보기">
+          <span class="filter-icon">🎯</span>
+          <span class="filter-text" id="toggleMyShiftText">내 근무 강조</span>
+        </button>
+
+        <!-- 월간 / 주간(아젠다) 탭 -->
+        <div class="view-mode-tabs">
+          <button type="button" class="view-tab active" id="monthViewTab">월간</button>
+          <button type="button" class="view-tab" id="weekViewTab">주간</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 이번 달 근무 통계 요약 바 (Stats Bar) -->
+    <section class="stats-summary-bar" aria-label="이번 달 근무 통계">
+      <div class="stat-pill day">
+        <span class="pill-dot"></span>
+        <span class="pill-label">일근(09~18)</span>
+        <strong class="pill-value" id="statDayCount">0</strong>일
+      </div>
+      <div class="stat-pill night">
+        <span class="pill-dot"></span>
+        <span class="pill-label">야간(18~24)</span>
+        <strong class="pill-value" id="statNightCount">0</strong>일
+      </div>
+      <div class="stat-pill early">
+        <span class="pill-dot"></span>
+        <span class="pill-label">조출(00~09)</span>
+        <strong class="pill-value" id="statEarlyCount">0</strong>일
+      </div>
+      <div class="stat-pill off">
+        <span class="pill-dot"></span>
+        <span class="pill-label">비번(휴무)</span>
+        <strong class="pill-value" id="statOffCount">0</strong>일
+      </div>
+      <div class="stat-pill total-hours">
+        <span class="pill-label">예상 총 근무</span>
+        <strong class="pill-value" id="statTotalHours">0</strong>시간
+      </div>
+    </section>
+
+    <!-- 6. 메인 뷰: 월간 달력 뷰 (Month View) -->
+    <section class="calendar-app-card" id="monthViewContainer">
+      <!-- 요일 헤더 -->
+      <div class="weekday-header-grid">
+        <div class="weekday sun">일</div>
+        <div class="weekday">월</div>
+        <div class="weekday">화</div>
+        <div class="weekday">수</div>
+        <div class="weekday">목</div>
+        <div class="weekday">금</div>
+        <div class="weekday sat">토</div>
+      </div>
+
+      <!-- 날짜 그리드 (7열 반응형) -->
+      <div class="days-app-grid" id="calendarAppGrid">
+        <!-- JS로 동적 렌더링 -->
+      </div>
+    </section>
+
+    <!-- 7. 서브 뷰: 주간/아젠다 뷰 (Week View - 모바일 최적화) -->
+    <section class="agenda-app-card" id="weekViewContainer" style="display: none;">
+      <div class="agenda-list" id="agendaList">
+        <!-- JS로 동적 렌더링 -->
+      </div>
+    </section>
+
+    <!-- 8. 하단 근무 범례 (Legend) -->
+    <footer class="app-legend-footer">
+      <div class="legend-item"><span class="legend-badge day">☀️ 일</span> 일근 (09~18)</div>
+      <div class="legend-item"><span class="legend-badge night">🌙 야</span> 야간 (18~24)</div>
+      <div class="legend-item"><span class="legend-badge early">🌅 조</span> 조출 (00~09)</div>
+      <div class="legend-item"><span class="legend-badge off">🌿 비</span> 비번 (휴식)</div>
+    </footer>
+
+  </div>
+
+  <!-- ==========================================
+       바텀 시트 / 상세 팝업 (모달)
+       ========================================== -->
+  <div class="app-modal-overlay" id="detailModal">
+    <div class="app-bottom-sheet">
+      <div class="sheet-drag-handle"></div>
+
+      <div class="sheet-header">
+        <div class="sheet-title-group">
+          <span class="sheet-sub">근무 상세 & 대근 메모</span>
+          <h2 class="sheet-title" id="modalDateDisplay">2026년 9월 10일 (목)</h2>
+        </div>
+        <button type="button" class="sheet-close-btn" id="closeDetailModalBtn">&times;</button>
+      </div>
+
+      <!-- 4개 조 근무 카드 리스트 -->
+      <div class="sheet-teams-list" id="modalTeamsList">
+        <!-- JS로 동적 생성 -->
+      </div>
+
+      <!-- 대근 / 맞교환 메모 인풋 -->
+      <div class="sheet-memo-box">
+        <label for="dateMemoInput" class="memo-field-label">
+          📝 대근(근무 맞교환) 및 메모
+        </label>
+        <textarea id="dateMemoInput" class="memo-field-textarea" placeholder="예: 3조 김철수 님과 야간 ↔ 조출 교환, 점검 일정 등"></textarea>
+      </div>
+
+      <div class="sheet-actions">
+        <button type="button" class="app-btn btn-ghost" id="cancelMemoBtn">닫기</button>
+        <button type="button" class="app-btn btn-accent" id="saveMemoBtn">메모 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       설정 모달 (기준일 설정)
+       ========================================== -->
+  <div class="app-modal-overlay" id="settingsModal">
+    <div class="app-bottom-sheet settings-sheet">
+      <div class="sheet-drag-handle"></div>
+
+      <div class="sheet-header">
+        <h2 class="sheet-title">⚙️ 교대 주기 기준일 설정</h2>
+        <button type="button" class="sheet-close-btn" id="closeSettingsModalBtn">&times;</button>
+      </div>
+
+      <p class="settings-desc">
+        1조가 <strong>'일근(☀️)'</strong>으로 시작하는 기준 날짜를 지정하면 전체 달력의 교대 순환이 자동으로 정확하게 동기화됩니다.
+      </p>
+
+      <div class="settings-field">
+        <label for="anchorDateInput" class="memo-field-label">기준일 (1조 일근 시작일):</label>
+        <input type="date" id="anchorDateInput" class="settings-date-input">
+      </div>
+
+      <div class="sheet-actions">
+        <button type="button" class="app-btn btn-ghost" id="resetAnchorBtn">기본값(2026-09-01)</button>
+        <button type="button" class="app-btn btn-accent" id="saveAnchorBtn">설정 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스크립트 연결 -->
+  <script src="./js/shift-engine.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
